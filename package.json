@@ -138,7 +138,15 @@
     },
     "packageManager": "npm@10.9.2",
     "workspaces": [
-        "docs",
         "tsunami/frontend"
-    ]
+    ],
+    "allowScripts": {
+        "@parcel/watcher@2.5.1": true,
+        "@swc/core@1.15.11": true,
+        "electron@41.1.0": true,
+        "electron-winstaller@5.4.0": true,
+        "esbuild@0.25.12": true,
+        "esbuild@0.28.1": true,
+        "sharp@0.34.5": true
+    }
 }
