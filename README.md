@@ -1,3 +1,5 @@
+> **FlowTerm** is a secondary-development fork of [Wave Terminal](https://github.com/wavetermdev/waveterm) (Apache-2.0, © Command Line Inc). All original license notices are preserved in [LICENSE](LICENSE) and [NOTICE](NOTICE).
+
 <p align="center">
   <a href="https://www.waveterm.dev">
 	<picture>
