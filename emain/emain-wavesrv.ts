@@ -70,6 +70,7 @@ export function runWaveSrv(handleWSEvent: (evtMsg: WSEventType) => void): Promis
     envCopy[WaveAuthKeyEnv] = AuthKey;
     envCopy[WaveDataHomeVarName] = getWaveDataDir();
     envCopy[WaveConfigHomeVarName] = getWaveConfigDir();
+    envCopy["WAVETERM_LOCALE"] = electron.app.getLocale();
     const waveSrvCmd = getWaveSrvPath();
     console.log("trying to run local server", waveSrvCmd);
     const proc = child_process.spawn(getWaveSrvPath(), {

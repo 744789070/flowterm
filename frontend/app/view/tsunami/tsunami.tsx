@@ -6,9 +6,17 @@ import { waveEventSubscribeSingle } from "@/app/store/wps";
 import { RpcApi } from "@/app/store/wshclientapi";
 import { TabRpcClient } from "@/app/store/wshrpcutil";
 import { WebView, WebViewModel } from "@/app/view/webview/webview";
+import { resolvedLangAtom, t, tLang, useT, type TranslationKey } from "@/i18n/i18n";
 import * as services from "@/store/services";
 import * as jotai from "jotai";
 import { memo, useEffect } from "react";
+
+const NavLabelKeys: TranslationKey[] = [
+    "webview.setBlockHomepage",
+    "webview.setDefaultHomepage",
+    "webview.hideNavigation",
+    "webview.unHideNavigation",
+];
 
 class TsunamiViewModel extends WebViewModel {
     shellProcFullStatus: jotai.PrimitiveAtom<BlockControllerRuntimeStatus>;
@@ -56,7 +64,7 @@ class TsunamiViewModel extends WebViewModel {
         });
         this.viewName = jotai.atom((get) => {
             const meta = get(this.appMeta);
-            return meta?.title || "WaveApp";
+            return meta?.title || tLang(get(resolvedLangAtom), "views.waveApp");
         });
         const initialRTInfo = RpcApi.GetRTInfoCommand(TabRpcClient, {
             oref: WOS.makeORef("block", this.blockId),
@@ -183,7 +191,11 @@ class TsunamiViewModel extends WebViewModel {
         // Filter out homepage and navigation-related menu items for tsunami view
         const filteredItems = items.filter((item) => {
             const label = item.label?.toLowerCase() || "";
+            const isNavItem = NavLabelKeys.some(
+                (key) => label === tLang("en", key).toLowerCase() || label === tLang("zh", key).toLowerCase()
+            );
             return (
+                !isNavItem &&
                 !label.includes("homepage") &&
                 !label.includes("home page") &&
                 !label.includes("navigation") &&
@@ -199,15 +211,15 @@ class TsunamiViewModel extends WebViewModel {
         // Add tsunami-specific menu items at the beginning
         const tsunamiItems: ContextMenuItem[] = [
             {
-                label: "Stop WaveApp",
+                label: t("webview.tsunami.stop"),
                 click: () => this.destroyController(),
             },
             {
-                label: "Restart WaveApp",
+                label: t("webview.tsunami.restart"),
                 click: () => this.restartController(),
             },
             {
-                label: "Restart WaveApp and Force Rebuild",
+                label: t("webview.tsunami.restartForceRebuild"),
                 click: () => this.restartAndForceRebuild(),
             },
             {
@@ -218,7 +230,7 @@ class TsunamiViewModel extends WebViewModel {
         if (showRemixOption) {
             tsunamiItems.push(
                 {
-                    label: "Remix WaveApp in Builder",
+                    label: t("webview.tsunami.remixInBuilder"),
                     click: () => this.remixInBuilder(),
                 },
                 {
@@ -233,6 +245,7 @@ class TsunamiViewModel extends WebViewModel {
 
 const TsunamiView = memo((props: ViewComponentProps<TsunamiViewModel>) => {
     const { model } = props;
+    const t = useT();
     const shellProcFullStatus = jotai.useAtomValue(model.shellProcFullStatus);
     const blockData = jotai.useAtomValue(model.blockAtom);
     const isRestarting = jotai.useAtomValue(model.isRestarting);
@@ -249,10 +262,10 @@ const TsunamiView = memo((props: ViewComponentProps<TsunamiViewModel>) => {
     // Check for configuration errors
     const errors = [];
     if (!appPath && !appId) {
-        errors.push("App path or app ID must be set (tsunami:apppath or tsunami:appid)");
+        errors.push(t("webview.tsunami.appPathOrIdRequired"));
     }
     if (controller !== "tsunami") {
-        errors.push("Invalid controller (must be 'tsunami')");
+        errors.push(t("webview.tsunami.invalidController"));
     }
 
     // Show errors if any exist
@@ -298,10 +311,10 @@ const TsunamiView = memo((props: ViewComponentProps<TsunamiViewModel>) => {
                     onClick={() => model.forceRestartController()}
                     className="px-4 py-2 bg-accent-color text-primary-text-color rounded hover:bg-accent-color/80 transition-colors cursor-pointer"
                 >
-                    Start
+                    {t("webview.tsunami.start")}
                 </button>
             )}
-            {isRestarting && <div className="text-sm text-success-color">Starting...</div>}
+            {isRestarting && <div className="text-sm text-success-color">{t("webview.tsunami.starting")}</div>}
         </div>
     );
 });

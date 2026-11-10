@@ -3,6 +3,7 @@
 
 import { Tooltip } from "@/element/tooltip";
 import { WaveEnv, WaveEnvSubset, useWaveEnv } from "@/app/waveenv/waveenv";
+import { useT, type TranslationKey } from "@/i18n/i18n";
 import { useAtomValue } from "jotai";
 import { memo, useCallback } from "react";
 
@@ -15,14 +16,14 @@ type UpdateBannerEnv = WaveEnvSubset<{
     };
 }>;
 
-function getUpdateStatusMessage(status: string): string {
+function getUpdateStatusKey(status: string): TranslationKey {
     switch (status) {
         case "ready":
-            return "Update";
+            return "tab.update";
         case "downloading":
-            return "Downloading";
+            return "tab.downloading";
         case "installing":
-            return "Installing";
+            return "tab.installing";
         default:
             return null;
     }
@@ -30,8 +31,10 @@ function getUpdateStatusMessage(status: string): string {
 
 const UpdateStatusBannerComponent = () => {
     const env = useWaveEnv<UpdateBannerEnv>();
+    const t = useT();
     const appUpdateStatus = useAtomValue(env.atoms.updaterStatusAtom);
-    const updateStatusMessage = getUpdateStatusMessage(appUpdateStatus);
+    const updateStatusKey = getUpdateStatusKey(appUpdateStatus);
+    const updateStatusMessage = updateStatusKey ? t(updateStatusKey) : null;
 
     const onClick = useCallback(() => {
         env.electron.installAppUpdate();
@@ -42,7 +45,7 @@ const UpdateStatusBannerComponent = () => {
     }
 
     const isReady = appUpdateStatus === "ready";
-    const tooltipContent = isReady ? "Click to Install Update" : updateStatusMessage;
+    const tooltipContent = isReady ? t("tab.clickToInstallUpdate") : updateStatusMessage;
 
     return (
         <Tooltip

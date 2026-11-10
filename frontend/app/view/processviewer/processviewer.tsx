@@ -6,6 +6,7 @@ import { ContextMenuModel } from "@/app/store/contextmenu";
 import { globalStore } from "@/app/store/jotaiStore";
 import { TabRpcClient } from "@/app/store/wshrpcutil";
 import { MetaKeyAtomFnType, WaveEnv, WaveEnvSubset } from "@/app/waveenv/waveenv";
+import { resolvedLangAtom, t, tLang, useT, type TranslationKey } from "@/i18n/i18n";
 import * as keyutil from "@/util/keyutil";
 import { isMacOS } from "@/util/platformutil";
 import { isBlank, makeConnRoute } from "@/util/util";
@@ -75,7 +76,7 @@ export class ProcessViewerViewModel implements ViewModel {
     env: ProcessViewerEnv;
 
     viewIcon = jotai.atom<string>("microchip");
-    viewName = jotai.atom<string>("Processes");
+    viewName = jotai.atom<string>((get) => tLang(get(resolvedLangAtom), "views.processes"));
     manageConnection = jotai.atom<boolean>(true);
     filterOutNowsh = jotai.atom<boolean>(true);
     noPadding = jotai.atom<boolean>(true);
@@ -390,10 +391,12 @@ export class ProcessViewerViewModel implements ViewModel {
     async sendSignal(pid: number, signal: string, killLabel?: boolean) {
         const conn = globalStore.get(this.connection);
         const route = makeConnRoute(conn);
-        const label = killLabel ? "Killed" : `sent ${signal}`;
+        const message = killLabel
+            ? t("processviewer.killedMessage", { pid })
+            : t("processviewer.sentMessage", { pid, signal });
         try {
             await this.env.rpc.RemoteProcessSignalCommand(TabRpcClient, { pid, signal }, { route });
-            this.setActionStatus({ pid, message: `Process #${pid} ${label}`, isError: false });
+            this.setActionStatus({ pid, message, isError: false });
         } catch (e) {
             this.setActionStatus({ pid, message: String(e), isError: true });
         }
@@ -424,23 +427,23 @@ export class ProcessViewerViewModel implements ViewModel {
         const currentInterval = globalStore.get(this.fetchIntervalAtom);
         return [
             {
-                label: "Refresh Interval",
+                label: t("processviewer.refreshInterval"),
                 type: "submenu",
                 submenu: [
                     {
-                        label: "1 second",
+                        label: t("processviewer.oneSecond"),
                         type: "checkbox",
                         checked: currentInterval === 1000,
                         click: () => this.setFetchInterval(1000),
                     },
                     {
-                        label: "2 seconds",
+                        label: t("processviewer.twoSeconds"),
                         type: "checkbox",
                         checked: currentInterval === 2000,
                         click: () => this.setFetchInterval(2000),
                     },
                     {
-                        label: "5 seconds",
+                        label: t("processviewer.fiveSeconds"),
                         type: "checkbox",
                         checked: currentInterval === 5000,
                         click: () => this.setFetchInterval(5000),
@@ -463,21 +466,28 @@ export class ProcessViewerViewModel implements ViewModel {
 
 type ColDef = {
     key: SortCol;
-    label: string;
-    tooltip?: string;
+    labelKey: TranslationKey;
+    tooltipKey?: TranslationKey;
     width: string;
     align?: "right";
     hideOnPlatform?: string[];
 };
 
 const Columns: ColDef[] = [
-    { key: "pid", label: "PID", width: "70px", align: "right" },
-    { key: "command", label: "Command", width: "minmax(120px, 4fr)" },
-    { key: "status", label: "Status", width: "75px", hideOnPlatform: ["windows", "darwin"] },
-    { key: "user", label: "User", width: "80px", hideOnPlatform: ["windows"] },
-    { key: "threads", label: "NT", tooltip: "Num Threads", width: "40px", align: "right", hideOnPlatform: ["windows"] },
-    { key: "cpu", label: "CPU%", width: "70px", align: "right" },
-    { key: "mem", label: "Memory", width: "90px", align: "right" },
+    { key: "pid", labelKey: "processviewer.col.pid", width: "70px", align: "right" },
+    { key: "command", labelKey: "processviewer.col.command", width: "minmax(120px, 4fr)" },
+    { key: "status", labelKey: "processviewer.col.status", width: "75px", hideOnPlatform: ["windows", "darwin"] },
+    { key: "user", labelKey: "processviewer.col.user", width: "80px", hideOnPlatform: ["windows"] },
+    {
+        key: "threads",
+        labelKey: "processviewer.col.threads",
+        tooltipKey: "processviewer.col.threadsTooltip",
+        width: "40px",
+        align: "right",
+        hideOnPlatform: ["windows"],
+    },
+    { key: "cpu", labelKey: "processviewer.col.cpu", width: "70px", align: "right" },
+    { key: "mem", labelKey: "processviewer.col.memory", width: "90px", align: "right" },
 ];
 
 function getColumns(platform: string): ColDef[] {
@@ -499,6 +509,7 @@ const SortIndicator = React.memo(function SortIndicator({ active, desc }: { acti
 SortIndicator.displayName = "SortIndicator";
 
 const StatusIndicator = React.memo(function StatusIndicator({ model }: { model: ProcessViewerViewModel }) {
+    const t = useT();
     const paused = jotai.useAtomValue(model.pausedAtom);
     const error = jotai.useAtomValue(model.errorAtom);
     const lastSuccess = jotai.useAtomValue(model.lastSuccessAtom);
@@ -513,8 +524,8 @@ const StatusIndicator = React.memo(function StatusIndicator({ model }: { model: 
     if (paused) {
         const tooltipContent = (
             <div className="flex flex-col gap-0.5">
-                <span>Paused</span>
-                <span className="text-muted">Click to resume</span>
+                <span>{t("processviewer.paused")}</span>
+                <span className="text-muted">{t("processviewer.clickToResume")}</span>
             </div>
         );
         return (
@@ -534,11 +545,16 @@ const StatusIndicator = React.memo(function StatusIndicator({ model }: { model: 
 
     const stalled = lastSuccess > 0 && now - lastSuccess > 5000;
     const circleColor = error != null ? "text-error" : stalled ? "text-warning" : "text-success";
-    const statusLabel = error != null ? "Error" : stalled ? "Stalled" : "Updating";
+    const statusLabel =
+        error != null
+            ? t("processviewer.statusError")
+            : stalled
+              ? t("processviewer.statusStalled")
+              : t("processviewer.statusUpdating");
     const tooltipContent = (
         <div className="flex flex-col gap-0.5">
             <span>{statusLabel}</span>
-            <span className="text-muted">Click to pause</span>
+            <span className="text-muted">{t("processviewer.clickToPause")}</span>
         </div>
     );
 
@@ -568,6 +584,7 @@ const TableHeader = React.memo(function TableHeader({
     sortDesc: boolean;
     platform: string;
 }) {
+    const t = useT();
     const cols = getColumns(platform);
     const gridTemplate = getGridTemplate(platform);
     return (
@@ -575,18 +592,21 @@ const TableHeader = React.memo(function TableHeader({
             className="grid w-full shrink-0 border-b border-white/10 bg-panel text-xs text-secondary font-medium select-none"
             style={{ gridTemplateColumns: gridTemplate }}
         >
-            {cols.map((col) => (
-                <Tooltip
-                    key={col.key}
-                    content={col.tooltip}
-                    disable={!col.tooltip}
-                    divClassName={`px-2 py-1 cursor-pointer hover:text-primary hover:bg-white/5 transition-colors truncate flex items-center${col.align === "right" ? " justify-end" : ""}`}
-                    divOnClick={() => model.setSort(col.key)}
-                >
-                    <span className="truncate">{col.label}</span>
-                    <SortIndicator active={sortBy === col.key} desc={sortDesc} />
-                </Tooltip>
-            ))}
+            {cols.map((col) => {
+                const tooltipContent = col.tooltipKey != null ? t(col.tooltipKey) : null;
+                return (
+                    <Tooltip
+                        key={col.key}
+                        content={tooltipContent}
+                        disable={tooltipContent == null}
+                        divClassName={`px-2 py-1 cursor-pointer hover:text-primary hover:bg-white/5 transition-colors truncate flex items-center${col.align === "right" ? " justify-end" : ""}`}
+                        divOnClick={() => model.setSort(col.key)}
+                    >
+                        <span className="truncate">{t(col.labelKey)}</span>
+                        <SortIndicator active={sortBy === col.key} desc={sortDesc} />
+                    </Tooltip>
+                );
+            })}
         </div>
     );
 });
@@ -607,6 +627,7 @@ const ProcessRow = React.memo(function ProcessRow({
     onSelect: (pid: number) => void;
     onContextMenu: (pid: number, e: React.MouseEvent) => void;
 }) {
+    const t = useT();
     const cols = getColumns(platform);
     const visibleKeys = new Set(cols.map((c) => c.key));
     const gridTemplate = getGridTemplate(platform);
@@ -621,7 +642,7 @@ const ProcessRow = React.memo(function ProcessRow({
                 <div className="px-2 flex items-center truncate justify-end text-secondary font-mono text-[11px]">
                     {proc.pid}
                 </div>
-                <div className="px-2 flex items-center truncate text-muted italic">(gone)</div>
+                <div className="px-2 flex items-center truncate text-muted italic">{t("processviewer.gone")}</div>
                 {visibleKeys.has("status") && <div className="px-2 flex items-center truncate" />}
                 {visibleKeys.has("user") && <div className="px-2 flex items-center truncate" />}
                 {visibleKeys.has("threads") && <div className="px-2 flex items-center truncate" />}
@@ -662,6 +683,7 @@ const ProcessRow = React.memo(function ProcessRow({
 ProcessRow.displayName = "ProcessRow";
 
 const ActionStatusBar = React.memo(function ActionStatusBar({ model }: { model: ProcessViewerViewModel }) {
+    const t = useT();
     const actionStatus = jotai.useAtomValue(model.actionStatusAtom);
     if (actionStatus == null) return null;
 
@@ -670,7 +692,7 @@ const ActionStatusBar = React.memo(function ActionStatusBar({ model }: { model: 
             className={`shrink-0 flex items-center px-3 py-1 text-xs border-t border-white/10 ${actionStatus.isError ? "text-error" : "text-secondary"}`}
         >
             <span className="flex-1 truncate">
-                {actionStatus.isError ? `Error: ${actionStatus.message}` : actionStatus.message}
+                {actionStatus.isError ? t("processviewer.errorWithMessage", { message: actionStatus.message }) : actionStatus.message}
             </span>
             {actionStatus.isError && (
                 <button
@@ -694,6 +716,7 @@ type StatusBarProps = {
 };
 
 const StatusBar = React.memo(function StatusBar({ model, data, loading, error, wide }: StatusBarProps) {
+    const t = useT();
     const searchOpen = jotai.useAtomValue(model.searchOpenAtom);
     const totalCount = data?.totalcount ?? 0;
     const filteredCount = data?.filteredcount ?? 0;
@@ -713,14 +736,21 @@ const StatusBar = React.memo(function StatusBar({ model, data, loading, error, w
             : loading
               ? "…"
               : error
-                ? "Err"
+                ? t("processviewer.procErr")
                 : "";
 
     const hasSummaryLoad = summary != null && summary.load1 != null;
     const hasSummaryMem = summary != null && memUsedFmt != null;
     const hasSummaryCpu = summary != null && cpuPct != null;
 
-    const searchTooltip = isMacOS() ? "Search (Cmd-F)" : "Search (Alt-F)";
+    const searchTooltip = isMacOS() ? t("processviewer.searchTooltipCmd") : t("processviewer.searchTooltipAlt");
+    const cpuTooltipContent = hasSummaryCpu
+        ? t("processviewer.cpuTooltip", {
+              num: summary.numcpu,
+              cores: summary.numcpu === 1 ? t("processviewer.core") : t("processviewer.cores"),
+              max: summary.numcpu * 100,
+          })
+        : null;
 
     if (wide) {
         return (
@@ -730,7 +760,8 @@ const StatusBar = React.memo(function StatusBar({ model, data, loading, error, w
                 </div>
                 {hasSummaryLoad && (
                     <span className="shrink-0 whitespace-pre">
-                        Load{" "}
+                        {t("processviewer.load")}
+                        {" "}
                         <span className="font-mono text-[11px]">
                             {fmtLoad(summary.load1)} {fmtLoad(summary.load5)} {fmtLoad(summary.load15)}
                         </span>
@@ -740,7 +771,8 @@ const StatusBar = React.memo(function StatusBar({ model, data, loading, error, w
                     <>
                         <div className="w-px self-stretch bg-white/10 shrink-0" />
                         <span className="shrink-0 whitespace-pre">
-                            Mem{" "}
+                            {t("processviewer.mem")}
+                            {" "}
                             <span className="font-mono text-[11px]">
                                 {memUsedFmt} / {memTotalFmt}
                             </span>
@@ -750,10 +782,7 @@ const StatusBar = React.memo(function StatusBar({ model, data, loading, error, w
                 {hasSummaryCpu && (
                     <>
                         <div className="w-px self-stretch bg-white/10 shrink-0" />
-                        <Tooltip
-                            content={`100% per core · ${summary.numcpu} ${summary.numcpu === 1 ? "core" : "cores"} = ${summary.numcpu * 100}% max`}
-                            placement="bottom"
-                        >
+                        <Tooltip content={cpuTooltipContent} placement="bottom">
                             <span className="shrink-0 cursor-default whitespace-pre">
                                 CPU<span className="font-mono text-[11px]">x{summary.numcpu}</span>{" "}
                                 <span className="font-mono text-[11px]">{cpuPct}%</span>
@@ -762,7 +791,7 @@ const StatusBar = React.memo(function StatusBar({ model, data, loading, error, w
                     </>
                 )}
                 <span className="ml-auto whitespace-pre">
-                    Procs <span className="font-mono text-[11px]">{procCountValue}</span>
+                    {t("processviewer.procs")} <span className="font-mono text-[11px]">{procCountValue}</span>
                 </span>
                 <Tooltip content={searchTooltip} placement="bottom">
                     <button
@@ -785,7 +814,7 @@ const StatusBar = React.memo(function StatusBar({ model, data, loading, error, w
             <div className="flex flex-row flex-1 min-w-0 items-center">
                 {hasSummaryLoad && (
                     <div className="flex flex-col shrink-0 w-[100px] mr-1">
-                        <div>Load</div>
+                        <div>{t("processviewer.load")}</div>
                         <div className="font-mono text-[11px] whitespace-pre">
                             {fmtLoad(summary.load1)} {fmtLoad(summary.load5)} {fmtLoad(summary.load15)}
                         </div>
@@ -794,7 +823,7 @@ const StatusBar = React.memo(function StatusBar({ model, data, loading, error, w
                 {hasSummaryLoad && <div className="flex-1 max-w-3" />}
                 {hasSummaryMem && (
                     <div className="flex flex-col shrink-0 w-[95px] mr-1">
-                        <div>Mem</div>
+                        <div>{t("processviewer.mem")}</div>
                         <div className="font-mono text-[11px] whitespace-pre">
                             {memUsedFmt} / {memTotalFmt}
                         </div>
@@ -803,10 +832,7 @@ const StatusBar = React.memo(function StatusBar({ model, data, loading, error, w
                 {hasSummaryMem && <div className="flex-1 max-w-3" />}
                 {hasSummaryCpu && (
                     <div className="flex flex-col shrink-0 w-[55px] mr-1">
-                        <Tooltip
-                            content={`100% per core · ${summary.numcpu} ${summary.numcpu === 1 ? "core" : "cores"} = ${summary.numcpu * 100}% max`}
-                            placement="bottom"
-                        >
+                        <Tooltip content={cpuTooltipContent} placement="bottom">
                             <div className="cursor-default">
                                 CPU<span className="font-mono text-[11px]">x{summary.numcpu}</span>
                             </div>
@@ -817,7 +843,7 @@ const StatusBar = React.memo(function StatusBar({ model, data, loading, error, w
                 {hasSummaryCpu && <div className="flex-1 max-w-3" />}
                 <div className="flex-1" />
                 <div className="flex flex-col w-[38px] shrink-0">
-                    <div>Procs</div>
+                    <div>{t("processviewer.procs")}</div>
                     <div className="font-mono text-[11px] whitespace-pre">{procCountValue}</div>
                 </div>
                 <Tooltip content={searchTooltip} placement="bottom">
@@ -835,6 +861,7 @@ const StatusBar = React.memo(function StatusBar({ model, data, loading, error, w
 StatusBar.displayName = "StatusBar";
 
 const SearchBar = React.memo(function SearchBar({ model }: { model: ProcessViewerViewModel }) {
+    const t = useT();
     const searchOpen = jotai.useAtomValue(model.searchOpenAtom);
     const textSearch = jotai.useAtomValue(model.textSearchAtom);
     const inputRef = React.useRef<HTMLInputElement>(null);
@@ -854,7 +881,7 @@ const SearchBar = React.memo(function SearchBar({ model }: { model: ProcessViewe
                 ref={inputRef}
                 type="text"
                 value={textSearch}
-                placeholder="Filter processes…"
+                placeholder={t("processviewer.filterProcesses")}
                 className="flex-1 bg-transparent text-xs text-primary placeholder-secondary outline-none min-w-0"
                 onChange={(e) => model.setTextSearch(e.target.value)}
                 onKeyDown={(e) => {
@@ -877,6 +904,7 @@ SearchBar.displayName = "SearchBar";
 
 export const ProcessViewerView: React.FC<ViewComponentProps<ProcessViewerViewModel>> = React.memo(
     function ProcessViewerView({ blockId: _blockId, blockRef: _blockRef, contentRef: _contentRef, model }) {
+        const t = useT();
         const data = jotai.useAtomValue(model.dataAtom);
         const sortBy = jotai.useAtomValue(model.sortByAtom);
         const sortDesc = jotai.useAtomValue(model.sortDescAtom);
@@ -917,7 +945,7 @@ export const ProcessViewerView: React.FC<ViewComponentProps<ProcessViewerViewMod
 
                 const menu: ContextMenuItem[] = [
                     {
-                        label: "Copy PID",
+                        label: t("processviewer.copyPid"),
                         click: () => navigator.clipboard.writeText(String(pid)),
                     },
                     { type: "separator" },
@@ -925,7 +953,7 @@ export const ProcessViewerView: React.FC<ViewComponentProps<ProcessViewerViewMod
 
                 if (!isWindows) {
                     menu.push({
-                        label: "Signal",
+                        label: t("processviewer.signal"),
                         type: "submenu",
                         submenu: [
                             { label: "SIGTERM", click: () => model.sendSignal(pid, "SIGTERM") },
@@ -938,7 +966,7 @@ export const ProcessViewerView: React.FC<ViewComponentProps<ProcessViewerViewMod
                     });
                     menu.push({ type: "separator" });
                     menu.push({
-                        label: "Kill Process",
+                        label: t("processviewer.killProcess"),
                         click: () => model.sendSignal(pid, "SIGTERM", true),
                     });
                 }
@@ -948,7 +976,7 @@ export const ProcessViewerView: React.FC<ViewComponentProps<ProcessViewerViewMod
 
                 ContextMenuModel.getInstance().showContextMenu(menu, e);
             },
-            [model, setSelectedPid]
+            [model, setSelectedPid, t]
         );
 
         const platform = data?.platform ?? "";
@@ -993,7 +1021,7 @@ export const ProcessViewerView: React.FC<ViewComponentProps<ProcessViewerViewMod
                 <div className="flex-1 overflow-x-auto overflow-y-hidden">
                     {!connStatus?.connected ? (
                         <div className="flex items-center justify-center h-full text-secondary text-sm">
-                            Waiting for connection…
+                            {t("processviewer.waitingForConnection")}
                         </div>
                     ) : (
                         <div className="flex flex-col h-full min-w-full w-max">

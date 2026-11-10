@@ -10,6 +10,7 @@ import {
     transformBlocks,
 } from "@/app/element/markdown-util";
 import remarkMermaidToTag from "@/app/element/remark-mermaid-to-tag";
+import { useT } from "@/i18n/i18n";
 import { boundNumber, useAtomValueSafe, cn } from "@/util/util";
 import clsx from "clsx";
 import { Atom } from "jotai";
@@ -72,6 +73,7 @@ const Mermaid = ({ chart }: { chart: string }) => {
     const ref = useRef<HTMLDivElement>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const t = useT();
 
     useEffect(() => {
         const renderMermaid = async () => {
@@ -97,7 +99,7 @@ const Mermaid = ({ chart }: { chart: string }) => {
                 setIsLoading(false);
             } catch (err) {
                 console.error("Error rendering mermaid diagram:", err);
-                setError(`Failed to render diagram: ${err.message || err}`);
+                setError(t("preview.diagramFailed", { msg: err?.message || String(err) }));
                 setIsLoading(false);
             }
         };
@@ -109,10 +111,10 @@ const Mermaid = ({ chart }: { chart: string }) => {
         if (!ref.current) return;
 
         if (error) {
-            ref.current.textContent = `Error: ${error}`;
+            ref.current.textContent = t("preview.diagramError", { msg: error });
             ref.current.className = "mermaid error";
         } else if (isLoading) {
-            ref.current.textContent = "Loading diagram...";
+            ref.current.textContent = t("preview.loadingDiagram");
             ref.current.className = "mermaid";
         } else {
             ref.current.className = "mermaid";
@@ -136,6 +138,7 @@ type CodeBlockProps = {
 };
 
 const CodeBlock = ({ children, onClickExecute }: CodeBlockProps) => {
+    const t = useT();
     const getTextContent = (children: any): string => {
         if (typeof children === "string") {
             return children;
@@ -166,7 +169,7 @@ const CodeBlock = ({ children, onClickExecute }: CodeBlockProps) => {
         <pre className="codeblock">
             {children}
             <div className="codeblock-actions">
-                <CopyButton onClick={handleCopy} title="Copy" />
+                <CopyButton onClick={handleCopy} title={t("common.copy")} />
                 {onClickExecute && (
                     <IconButton
                         decl={{

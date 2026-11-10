@@ -10,6 +10,7 @@ import {
 } from "@/app/block/blocktypes";
 import { useTabModel } from "@/app/store/tab-model";
 import { useWaveEnv } from "@/app/waveenv/waveenv";
+import { t, useT } from "@/i18n/i18n";
 import { ErrorBoundary } from "@/element/errorboundary";
 import { CenteredDiv } from "@/element/quickelems";
 import { useDebouncedNodeInnerRect } from "@/layout/index";
@@ -34,10 +35,10 @@ function getViewElem(
     viewModel: ViewModel
 ): React.ReactElement {
     if (isBlank(blockView)) {
-        return <CenteredDiv>No View</CenteredDiv>;
+        return <CenteredDiv>{t("blockframe.noView")}</CenteredDiv>;
     }
     if (viewModel.viewComponent == null) {
-        return <CenteredDiv>No View Component</CenteredDiv>;
+        return <CenteredDiv>{t("blockframe.noViewComponent")}</CenteredDiv>;
     }
     const VC = viewModel.viewComponent;
     return <VC key={blockId} blockId={blockId} blockRef={blockRef} contentRef={contentRef} model={viewModel} />;
@@ -62,6 +63,7 @@ const BlockPreview = memo(({ nodeModel, viewModel }: FullBlockProps) => {
 
 const BlockSubBlock = memo(({ nodeModel, viewModel }: FullSubBlockProps) => {
     const waveEnv = useWaveEnv<BlockEnv>();
+    const t = useT();
     const blockIsNull = useAtomValue(waveEnv.wos.isWaveObjectNullAtom(makeORef("block", nodeModel.blockId)));
     const blockView = useAtomValue(waveEnv.getBlockMetaKeyAtom(nodeModel.blockId, "view")) ?? "";
     const blockRef = useRef<HTMLDivElement>(null);
@@ -77,7 +79,7 @@ const BlockSubBlock = memo(({ nodeModel, viewModel }: FullSubBlockProps) => {
     return (
         <div key="content" className={clsx("block-content", { "block-no-padding": noPadding })} ref={contentRef}>
             <ErrorBoundary>
-                <Suspense fallback={<CenteredDiv>Loading...</CenteredDiv>}>{viewElem}</Suspense>
+                <Suspense fallback={<CenteredDiv>{t("common.loading")}</CenteredDiv>}>{viewElem}</Suspense>
             </ErrorBoundary>
         </div>
     );
@@ -86,6 +88,7 @@ const BlockSubBlock = memo(({ nodeModel, viewModel }: FullSubBlockProps) => {
 const BlockFull = memo(({ nodeModel, viewModel }: FullBlockProps) => {
     counterInc("render-BlockFull");
     const waveEnv = useWaveEnv<BlockEnv>();
+    const t = useT();
     const focusElemRef = useRef<HTMLInputElement>(null);
     const blockRef = useRef<HTMLDivElement>(null);
     const contentRef = useRef<HTMLDivElement>(null);
@@ -259,7 +262,7 @@ const BlockFull = memo(({ nodeModel, viewModel }: FullBlockProps) => {
                 style={blockContentStyle}
             >
                 <ErrorBoundary>
-                    <Suspense fallback={<CenteredDiv>Loading...</CenteredDiv>}>{viewElem}</Suspense>
+                    <Suspense fallback={<CenteredDiv>{t("common.loading")}</CenteredDiv>}>{viewElem}</Suspense>
                 </ErrorBoundary>
             </div>
         </BlockFrame>

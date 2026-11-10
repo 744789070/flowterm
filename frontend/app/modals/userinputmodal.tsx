@@ -3,6 +3,7 @@
 
 import { Modal } from "@/app/modals/modal";
 import { Markdown } from "@/element/markdown";
+import { useT } from "@/i18n/i18n";
 import { modalsModel } from "@/store/modalmodel";
 import * as keyutil from "@/util/keyutil";
 import { fireAndForget } from "@/util/util";
@@ -10,6 +11,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { UserInputService } from "../store/services";
 
 const UserInputModal = (userInputRequest: UserInputRequest) => {
+    const t = useT();
     const [responseText, setResponseText] = useState("");
     const [countdown, setCountdown] = useState(Math.floor(userInputRequest.timeoutms / 1000));
     const checkboxRef = useRef<HTMLInputElement>(null);
@@ -155,7 +157,9 @@ const UserInputModal = (userInputRequest: UserInputRequest) => {
             okLabel={userInputRequest.oklabel}
             cancelLabel={userInputRequest.cancellabel}
         >
-            <div className="font-bold text-primary mx-4 pb-2.5">{userInputRequest.title + ` (${countdown}s)`}</div>
+            <div className="font-bold text-primary mx-4 pb-2.5">
+                {t("modals.userinput.titleWithCountdown", { title: userInputRequest.title, seconds: countdown })}
+            </div>
             <div className="flex flex-col justify-between gap-4 mx-4 mb-4 max-w-[500px] font-mono text-primary">
                 {queryText}
                 {inputBox}

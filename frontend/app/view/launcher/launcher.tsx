@@ -5,6 +5,8 @@ import logoUrl from "@/app/asset/logo.svg?url";
 import type { BlockNodeModel } from "@/app/block/blocktypes";
 import { atoms, globalStore, replaceBlock } from "@/app/store/global";
 import type { TabModel } from "@/app/store/tab-model";
+import { getWidgetDisplayLabel } from "@/app/workspace/widgets";
+import { resolvedLangAtom, tLang, useT } from "@/i18n/i18n";
 import { checkKeyPressed, keydownWrapper } from "@/util/keyutil";
 import { isBlank, makeIconClass } from "@/util/util";
 import clsx from "clsx";
@@ -26,7 +28,7 @@ export class LauncherViewModel implements ViewModel {
     tabModel: TabModel;
     viewType = "launcher";
     viewIcon = atom("shapes");
-    viewName = atom("Widget Launcher");
+    viewName = atom((get) => tLang(get(resolvedLangAtom), "views.widgetLauncher"));
     viewComponent = LauncherView;
     noHeader = atom(true);
     inputRef = { current: null } as React.RefObject<HTMLInputElement>;
@@ -138,6 +140,7 @@ export class LauncherViewModel implements ViewModel {
 }
 
 function LauncherView({ blockId, model }: ViewComponentProps<LauncherViewModel>) {
+    const t = useT();
     // Search and selection state
     const [searchTerm, setSearchTerm] = useAtom(model.searchTerm);
     const [selectedIndex, setSelectedIndex] = useAtom(model.selectedIndex);
@@ -219,13 +222,13 @@ function LauncherView({ blockId, model }: ViewComponentProps<LauncherViewModel>)
                 onKeyDown={keydownWrapper(model.keyDownHandler.bind(model))}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="sr-only dummy"
-                aria-label="Search widgets"
+                aria-label={t("launcher.searchWidgets")}
             />
 
             {/* Logo */}
             {showLogo && (
                 <div className="mb-6" style={{ width: logoWidth, maxWidth: 300 }}>
-                    <img src={logoUrl} className="w-full h-auto filter grayscale brightness-70 opacity-70" alt="Logo" />
+                    <img src={logoUrl} className="w-full h-auto filter grayscale brightness-70 opacity-70" alt={t("launcher.logo")} />
                 </div>
             )}
 
@@ -240,7 +243,7 @@ function LauncherView({ blockId, model }: ViewComponentProps<LauncherViewModel>)
                     <div
                         key={index}
                         onClick={() => model.handleWidgetSelect(widget)}
-                        title={widget.description || widget.label}
+                        title={widget.description || getWidgetDisplayLabel(widget.label, t)}
                         className={clsx(
                             "flex flex-col items-center justify-center cursor-pointer rounded-md p-2 text-center",
                             "transition-colors duration-150",
@@ -262,7 +265,7 @@ function LauncherView({ blockId, model }: ViewComponentProps<LauncherViewModel>)
                         </div>
                         {gridLayout.showLabel && !isBlank(widget.label) && (
                             <div className="mt-1 w-full text-[11px] leading-4 overflow-hidden text-ellipsis whitespace-nowrap">
-                                {widget.label}
+                                {getWidgetDisplayLabel(widget.label, t)}
                             </div>
                         )}
                     </div>
@@ -272,11 +275,12 @@ function LauncherView({ blockId, model }: ViewComponentProps<LauncherViewModel>)
             {/* Search instructions */}
             <div className="mt-4 text-secondary text-xs">
                 {filteredWidgets.length === 0 ? (
-                    <span>No widgets found. Press Escape to clear search.</span>
+                    <span>{t("launcher.noWidgetsFound")}</span>
                 ) : (
                     <span>
-                        {searchTerm == "" ? "Type to Filter" : "Searching " + '"' + searchTerm + '"'}, Enter to Launch,
-                        {searchTerm == "" ? "Arrow Keys to Navigate" : null}
+                        {searchTerm == ""
+                            ? t("launcher.hintDefault")
+                            : t("launcher.hintSearching", { term: searchTerm })}
                     </span>
                 )}
             </div>

@@ -1,6 +1,7 @@
 // Copyright 2025, Command Line Inc.
 // SPDX-License-Identifier: Apache-2.0
 
+import { t } from "@/i18n/i18n";
 import { sortByDisplayOrder } from "@/util/util";
 
 const TextFileLimit = 200 * 1024; // 200KB
@@ -372,8 +373,18 @@ export const validateFileSizeFromInfo = (
 };
 
 export const formatFileSizeError = (error: FileSizeError): string => {
-    const typeLabel = error.fileType === "image" ? "Image" : error.fileType === "pdf" ? "PDF" : "Text file";
-    return `${typeLabel} "${error.fileName}" is too large (${formatFileSize(error.fileSize)}). Maximum size is ${formatFileSize(error.maxSize)}.`;
+    const typeLabel =
+        error.fileType === "image"
+            ? t("aipanel.error.fileTypeImage")
+            : error.fileType === "pdf"
+              ? t("aipanel.error.fileTypePdf")
+              : t("aipanel.error.fileTypeText");
+    return t("aipanel.error.fileTooLarge", {
+        type: typeLabel,
+        name: error.fileName,
+        size: formatFileSize(error.fileSize),
+        max: formatFileSize(error.maxSize),
+    });
 };
 
 /**
@@ -591,8 +602,8 @@ export function getModeDisplayName(config: AIModeConfigType): string {
     const azureResourceName = config["ai:azureresourcename"];
 
     if (provider === "azure-legacy") {
-        return `${azureResourceName || "unknown"} (azure)`;
+        return `${azureResourceName || t("aipanel.aimode.unknownMode")} (azure)`;
     }
 
-    return `${model || "unknown"} (${provider || "custom"})`;
+    return `${model || t("aipanel.aimode.unknownMode")} (${provider || t("aipanel.aimode.unknownProvider")})`;
 }

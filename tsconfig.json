@@ -17,6 +17,7 @@
         "paths": {
             "@/app/*": ["frontend/app/*"],
             "@/builder/*": ["frontend/builder/*"],
+            "@/i18n/*": ["frontend/i18n/*"],
             "@/util/*": ["frontend/util/*"],
             "@/layout/*": ["frontend/layout/*"],
             "@/store/*": ["frontend/app/store/*"],

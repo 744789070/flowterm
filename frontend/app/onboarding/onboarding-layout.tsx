@@ -4,6 +4,7 @@
 import { MagnifyIcon } from "@/app/element/magnify";
 import { WaveStreamdown } from "@/app/element/streamdown";
 import { CodeEditor } from "@/app/view/codeeditor/codeeditor";
+import { useT } from "@/i18n/i18n";
 import { cn, makeIconClass } from "@/util/util";
 import { useLayoutEffect, useRef, useState } from "react";
 
@@ -78,6 +79,7 @@ export const FakeLayout = () => {
         null
     );
     const [isExpanded, setIsExpanded] = useState(false);
+    const t = useT();
 
     useLayoutEffect(() => {
         if (highlightedContainerRef.current) {
@@ -155,14 +157,14 @@ export const FakeLayout = () => {
     return (
         <div ref={layoutRef} className="w-full h-[400px] flex flex-row gap-2 relative">
             <div className="flex-1">
-                <FakeBlock icon="terminal" name="Terminal" />
+                <FakeBlock icon="terminal" name={t("onboarding.layout.terminal")} />
             </div>
             <div className="flex-1 flex flex-col gap-2">
                 <div className="flex-1">
-                    <FakeBlock icon="globe" name="Web" />
+                    <FakeBlock icon="globe" name={t("onboarding.layout.web")} />
                 </div>
                 <div className="flex-1" ref={highlightedContainerRef}>
-                    <FakeBlock icon="terminal" name="Terminal" highlighted={true} className="opacity-0" />
+                    <FakeBlock icon="terminal" name={t("onboarding.layout.terminal")} highlighted={true} className="opacity-0" />
                 </div>
             </div>
             {blockRect && (
@@ -174,7 +176,7 @@ export const FakeLayout = () => {
                         )}
                     />
                     <div className="absolute transition-all duration-200 ease-in-out" style={getAnimatedStyle()}>
-                        <FakeBlock icon="terminal" name="Terminal" highlighted={true} />
+                        <FakeBlock icon="terminal" name={t("onboarding.layout.terminal")} highlighted={true} />
                     </div>
                 </>
             )}

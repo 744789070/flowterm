@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { MagnifyIcon } from "@/app/element/magnify";
+import { useT, type TranslationKey } from "@/i18n/i18n";
+import type { TranslationVars } from "@/i18n/types";
 import { cn, makeIconClass } from "@/util/util";
 import { useCallback, useLayoutEffect, useState } from "react";
 import { CommandReveal } from "./onboarding-command";
@@ -74,20 +76,21 @@ export const FakeTermBlock = ({
     );
 };
 
-const deployMessages = [
-    "[1/8] Installing dependencies...",
-    "[2/8] Generating TypeScript types from Go...",
-    "[3/8] Building Go backend (wavesrv)...",
-    "[4/8] Compiling TypeScript frontend...",
-    "[5/8] Bundling Electron renderer...",
-    "[6/8] Packaging application artifacts...",
-    "[7/8] Code signing binaries...",
-    "[8/8] Deploy complete ✓",
+const getDeployMessages = (t: (key: TranslationKey, vars?: TranslationVars) => string): string[] => [
+    t("onboarding.deployLog.msg1"),
+    t("onboarding.deployLog.msg2"),
+    t("onboarding.deployLog.msg3"),
+    t("onboarding.deployLog.msg4"),
+    t("onboarding.deployLog.msg5"),
+    t("onboarding.deployLog.msg6"),
+    t("onboarding.deployLog.msg7"),
+    t("onboarding.deployLog.msg8"),
 ];
 
 type OverlayState = null | "disconnected" | "connected";
 
 const ConnectionOverlay = ({ state }: { state: OverlayState }) => {
+    const t = useT();
     if (!state) return null;
 
     const isConnected = state === "connected";
@@ -103,7 +106,7 @@ const ConnectionOverlay = ({ state }: { state: OverlayState }) => {
                     )}
                 />
                 <div className="text-2xl font-semibold text-foreground">
-                    {isConnected ? "Connected" : "Disconnected"}
+                    {isConnected ? t("onboarding.termblock.connected") : t("onboarding.termblock.disconnected")}
                 </div>
             </div>
         </div>
@@ -117,6 +120,8 @@ const DeployLogOutput = ({
     onComplete?: () => void;
     onOverlayStateChange?: (state: OverlayState) => void;
 }) => {
+    const t = useT();
+    const deployMessages = getDeployMessages(t);
     const [key, setKey] = useState(0);
     const [commandComplete, setCommandComplete] = useState(false);
     const [visibleLines, setVisibleLines] = useState(0);

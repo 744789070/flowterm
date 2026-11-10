@@ -5,6 +5,7 @@ import { Tooltip } from "@/app/element/tooltip";
 import { TabRpcClient } from "@/app/store/wshrpcutil";
 import { useWaveEnv, WaveEnv, WaveEnvSubset } from "@/app/waveenv/waveenv";
 import { shouldIncludeWidgetForWorkspace } from "@/app/workspace/widgetfilter";
+import { useT, type TranslationKey } from "@/i18n/i18n";
 import { modalsModel } from "@/store/modalmodel";
 import { fireAndForget, isBlank, makeIconClass } from "@/util/util";
 import {
@@ -60,7 +61,27 @@ async function handleWidgetSelect(widget: WidgetConfigType, env: WidgetsEnv) {
     env.createBlock(blockDef, widget.magnified);
 }
 
+// labels of the default widgets shipped in pkg/wconfig/defaultconfig/widgets.json are config data;
+// translate the known ones at display time so user-customized labels pass through untouched
+const DefaultWidgetLabelKeys: Record<string, TranslationKey> = {
+    terminal: "workspace.widgetLabels.terminal",
+    files: "workspace.widgetLabels.files",
+    web: "workspace.widgetLabels.web",
+    sysinfo: "workspace.widgetLabels.sysinfo",
+    processes: "workspace.widgetLabels.processes",
+};
+
+export function getWidgetDisplayLabel(label: string, t: (key: TranslationKey) => string): string {
+    const key = DefaultWidgetLabelKeys[label];
+    if (key == null) {
+        return label;
+    }
+    return t(key);
+}
+
 const Widget = memo(({ widget, mode, env }: WidgetPropsType) => {
+    const t = useT();
+    const displayLabel = getWidgetDisplayLabel(widget.label, t);
     const [isTruncated, setIsTruncated] = useState(false);
     const labelRef = useRef<HTMLDivElement>(null);
 
@@ -69,13 +90,13 @@ const Widget = memo(({ widget, mode, env }: WidgetPropsType) => {
             const element = labelRef.current;
             setIsTruncated(element.scrollWidth > element.clientWidth);
         }
-    }, [mode, widget.label]);
+    }, [mode, displayLabel]);
 
     const shouldDisableTooltip = mode !== "normal" ? false : !isTruncated;
 
     return (
         <Tooltip
-            content={widget.description || widget.label}
+            content={widget.description || displayLabel}
             placement="left"
             disable={shouldDisableTooltip}
             divClassName={clsx(
@@ -93,7 +114,7 @@ const Widget = memo(({ widget, mode, env }: WidgetPropsType) => {
                     ref={labelRef}
                     className="text-xxs mt-0.5 w-full px-0.5 text-center whitespace-nowrap overflow-hidden text-ellipsis"
                 >
-                    {widget.label}
+                    {displayLabel}
                 </div>
             ) : null}
         </Tooltip>
@@ -109,15 +130,16 @@ function calculateGridSize(appCount: number): number {
 }
 
 function SettingsTooltipContent({ hasConfigErrors }: { hasConfigErrors: boolean }) {
+    const t = useT();
     if (!hasConfigErrors) {
-        return "Settings & Help";
+        return t("workspace.settingsAndHelp");
     }
     return (
         <div className="flex flex-col p-1">
-            <div className="mb-1">Settings &amp; Help</div>
+            <div className="mb-1">{t("workspace.settingsAndHelp")}</div>
             <div className="flex items-center gap-1 mt-0.5 text-error">
                 <i className="fa fa-solid fa-circle-exclamation"></i>
-                <span>Config Errors</span>
+                <span>{t("workspace.configErrors")}</span>
             </div>
         </div>
     );
@@ -134,6 +156,7 @@ const AppsFloatingWindow = memo(({ isOpen, onClose, referenceElement }: Floating
     const [apps, setApps] = useState<AppInfo[]>([]);
     const [loading, setLoading] = useState(true);
     const env = useWaveEnv<WidgetsEnv>();
+    const t = useT();
 
     const { refs, floatingStyles, context } = useFloating({
         open: isOpen,
@@ -197,7 +220,7 @@ const AppsFloatingWindow = memo(({ isOpen, onClose, referenceElement }: Floating
                             <i className="fa fa-solid fa-spinner fa-spin text-2xl text-muted"></i>
                         </div>
                     ) : apps.length === 0 ? (
-                        <div className="text-muted text-sm p-4 text-center">No local apps found</div>
+                        <div className="text-muted text-sm p-4 text-center">{t("workspace.noLocalApps")}</div>
                     ) : (
                         <div
                             className="grid gap-3"
@@ -246,7 +269,7 @@ const AppsFloatingWindow = memo(({ isOpen, onClose, referenceElement }: Floating
                     onClick={handleOpenBuilder}
                 >
                     <i className="fa fa-solid fa-hammer"></i>
-                    Build/Edit Apps
+                    {t("workspace.buildEditApps")}
                 </button>
             </div>
         </FloatingPortal>
@@ -256,6 +279,7 @@ const AppsFloatingWindow = memo(({ isOpen, onClose, referenceElement }: Floating
 const SettingsFloatingWindow = memo(
     ({ isOpen, onClose, referenceElement, hasConfigErrors }: FloatingWindowPropsType) => {
         const env = useWaveEnv<WidgetsEnv>();
+        const t = useT();
         const { refs, floatingStyles, context } = useFloating({
             open: isOpen,
             onOpenChange: onClose,
@@ -275,7 +299,7 @@ const SettingsFloatingWindow = memo(
         const menuItems = [
             {
                 icon: "gear",
-                label: "Settings",
+                label: t("common.settings"),
                 hasError: hasConfigErrors,
                 onClick: () => {
                     const blockDef: BlockDef = {
@@ -289,7 +313,7 @@ const SettingsFloatingWindow = memo(
             },
             {
                 icon: "lightbulb",
-                label: "Tips",
+                label: t("views.tips"),
                 onClick: () => {
                     const blockDef: BlockDef = {
                         meta: {
@@ -302,7 +326,7 @@ const SettingsFloatingWindow = memo(
             },
             {
                 icon: "lock",
-                label: "Secrets",
+                label: t("workspace.secrets"),
                 onClick: () => {
                     const blockDef: BlockDef = {
                         meta: {
@@ -316,7 +340,7 @@ const SettingsFloatingWindow = memo(
             },
             {
                 icon: "book-open",
-                label: "Release Notes",
+                label: t("workspace.releaseNotes"),
                 onClick: () => {
                     modalsModel.pushModal("UpgradeOnboardingPatch", { isReleaseNotes: true });
                     onClose();
@@ -324,7 +348,7 @@ const SettingsFloatingWindow = memo(
             },
             {
                 icon: "circle-question",
-                label: "Help",
+                label: t("views.help"),
                 onClick: () => {
                     const blockDef: BlockDef = {
                         meta: {
@@ -370,6 +394,7 @@ SettingsFloatingWindow.displayName = "SettingsFloatingWindow";
 
 const Widgets = memo(() => {
     const env = useWaveEnv<WidgetsEnv>();
+    const t = useT();
     const fullConfig = useAtomValue(env.atoms.fullConfigAtom);
     const hasConfigErrors = useAtomValue(env.atoms.hasConfigErrors);
     const workspaceId = useAtomValue(env.atoms.workspaceId);
@@ -438,7 +463,7 @@ const Widgets = memo(() => {
         e.preventDefault();
         const menu: ContextMenuItem[] = [
             {
-                label: "Edit widgets.json",
+                label: t("workspace.editWidgetsJson"),
                 click: () => {
                     fireAndForget(async () => {
                         const blockDef: BlockDef = {
@@ -477,7 +502,11 @@ const Widgets = memo(() => {
                                     className="flex flex-col justify-center items-center w-full py-1.5 pr-0.5 text-secondary text-sm overflow-hidden rounded-sm hover:bg-hoverbg hover:text-white cursor-pointer"
                                     onClick={() => setIsAppsOpen(!isAppsOpen)}
                                 >
-                                    <Tooltip content="Local WaveApps" placement="left" disable={isAppsOpen}>
+                                    <Tooltip
+                                        content={t("workspace.localWaveApps")}
+                                        placement="left"
+                                        disable={isAppsOpen}
+                                    >
                                         <div>
                                             <i className={makeIconClass("cube", true)}></i>
                                         </div>
@@ -516,14 +545,14 @@ const Widgets = memo(() => {
                                 className="flex flex-col justify-center items-center w-full py-1.5 pr-0.5 text-secondary text-lg overflow-hidden rounded-sm hover:bg-hoverbg hover:text-white cursor-pointer"
                                 onClick={() => setIsAppsOpen(!isAppsOpen)}
                             >
-                                <Tooltip content="Local WaveApps" placement="left" disable={isAppsOpen}>
+                                <Tooltip content={t("workspace.localWaveApps")} placement="left" disable={isAppsOpen}>
                                     <div className="flex flex-col items-center w-full">
                                         <div>
                                             <i className={makeIconClass("cube", true)}></i>
                                         </div>
                                         {mode === "normal" && (
                                             <div className="text-xxs mt-0.5 w-full px-0.5 text-center whitespace-nowrap overflow-hidden text-ellipsis">
-                                                apps
+                                                {t("workspace.appsLabel")}
                                             </div>
                                         )}
                                     </div>
@@ -551,7 +580,7 @@ const Widgets = memo(() => {
                                     </div>
                                     {mode === "normal" && (
                                         <div className="text-xxs mt-0.5 w-full px-0.5 text-center whitespace-nowrap overflow-hidden text-ellipsis">
-                                            settings
+                                            {t("workspace.settingsLabel")}
                                         </div>
                                     )}
                                 </div>
@@ -562,7 +591,7 @@ const Widgets = memo(() => {
                 {env.isDev() ? (
                     <div
                         className="flex justify-center items-center w-full py-1 text-accent text-[30px]"
-                        title="Running Wave Dev Build"
+                        title={t("workspace.runningWaveDevBuild")}
                     >
                         <i className="fa fa-brands fa-dev fa-fw" />
                     </div>
@@ -596,20 +625,20 @@ const Widgets = memo(() => {
                     <div>
                         <i className={makeIconClass("gear", true)}></i>
                     </div>
-                    <div className="text-xxs mt-0.5 w-full px-0.5 text-center">settings</div>
+                    <div className="text-xxs mt-0.5 w-full px-0.5 text-center">{t("workspace.settingsLabel")}</div>
                 </div>
                 {env.isDev() ? (
                     <div className="flex flex-col justify-center items-center w-full py-1.5 pr-0.5 text-lg">
                         <div>
                             <i className={makeIconClass("cube", true)}></i>
                         </div>
-                        <div className="text-xxs mt-0.5 w-full px-0.5 text-center">apps</div>
+                        <div className="text-xxs mt-0.5 w-full px-0.5 text-center">{t("workspace.appsLabel")}</div>
                     </div>
                 ) : null}
                 {env.isDev() ? (
                     <div
                         className="flex justify-center items-center w-full py-1 text-accent text-[30px]"
-                        title="Running Wave Dev Build"
+                        title={t("workspace.runningWaveDevBuild")}
                     >
                         <i className="fa fa-brands fa-dev fa-fw" />
                     </div>

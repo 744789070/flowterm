@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { fireAndForget } from "@/util/util";
+import { t } from "@/i18n/i18n";
 import { app, dialog, ipcMain, shell } from "electron";
 import envPaths from "env-paths";
 import { existsSync, mkdirSync } from "fs";
@@ -46,9 +47,9 @@ export function checkIfRunningUnderARM64Translation(fullConfig: FullConfigType) 
         console.log("Running under ARM64 translation, alerting user");
         const dialogOpts: Electron.MessageBoxOptions = {
             type: "warning",
-            buttons: ["Dismiss", "Learn More"],
-            title: "FlowTerm has detected a performance issue",
-            message: `FlowTerm is running in ARM64 translation mode which may impact performance.\n\nRecommendation: Download the native ARM64 version from our website for optimal performance.`,
+            buttons: [t("main.dialogs.dismissButton"), t("main.dialogs.learnMoreButton")],
+            title: t("main.dialogs.arm64Title"),
+            message: t("main.dialogs.arm64Message"),
         };
 
         const choice = dialog.showMessageBoxSync(null, dialogOpts);
@@ -266,12 +267,21 @@ async function callWithOriginalXdgCurrentDesktopAsync(callback: () => Promise<vo
     }
 }
 
+// 应用窗口/任务栏图标（吉祥物）。dev 时在仓库 public/ 下；打包后在 renderer 构建输出里。
+function getWaveAppIconPath(): string {
+    if (isDev) {
+        return path.join(getElectronAppBasePath(), "..", "public", "logos", "mascot-256.png");
+    }
+    return path.join(getElectronAppUnpackedBasePath(), "frontend", "logos", "mascot-256.png");
+}
+
 export {
     callWithOriginalXdgCurrentDesktop,
     callWithOriginalXdgCurrentDesktopAsync,
     getElectronAppBasePath,
     getElectronAppResourcesPath,
     getElectronAppUnpackedBasePath,
+    getWaveAppIconPath,
     getWaveConfigDir,
     getWaveDataDir,
     getWaveSrvCwd,

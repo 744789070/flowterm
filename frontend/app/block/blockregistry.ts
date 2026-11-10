@@ -11,10 +11,11 @@ import { SysinfoViewModel } from "@/app/view/sysinfo/sysinfo";
 import { TsunamiViewModel } from "@/app/view/tsunami/tsunami";
 import { VDomModel } from "@/app/view/vdom/vdom-model";
 import { WaveEnv } from "@/app/waveenv/waveenv";
+import { resolvedLangAtom, tLang } from "@/i18n/i18n";
 import { atom } from "jotai";
 import { QuickTipsViewModel } from "../view/quicktipsview/quicktipsview";
 import { WaveConfigViewModel } from "../view/waveconfig/waveconfig-model";
-import { blockViewToIcon, blockViewToName } from "./blockutil";
+import { blockViewToIcon, blockViewToNameKey } from "./blockutil";
 import { HelpViewModel } from "@/view/helpview/helpview";
 import { TermViewModel } from "@/view/term/term-model";
 import { WaveAiModel } from "@/view/waveai/waveai";
@@ -40,7 +41,10 @@ function makeDefaultViewModel(viewType: string): ViewModel {
     const viewModel: ViewModel = {
         viewType: viewType,
         viewIcon: atom(blockViewToIcon(viewType)),
-        viewName: atom(blockViewToName(viewType)),
+        viewName: atom((get) => {
+            const nameKey = blockViewToNameKey(viewType);
+            return nameKey != null ? tLang(get(resolvedLangAtom), nameKey) : viewType;
+        }),
         preIconButton: atom(null),
         endIconButtons: atom(null),
         viewComponent: null,

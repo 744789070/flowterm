@@ -14,6 +14,7 @@ import Papa from "papaparse";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { useDimensionsWithExistingRef } from "@/app/hook/useDimensions";
+import { useT } from "@/i18n/i18n";
 import "./csvview.scss";
 
 const MAX_DATA_SIZE = 10 * 1024 * 1024; // 10MB in bytes
@@ -39,6 +40,7 @@ const columnHelper = createColumnHelper<any>();
 
 // TODO remove parentRef dependency -- use own height
 const CSVView = ({ parentRef, filename, content }: CSVViewProps) => {
+    const t = useT();
     const csvCacheRef = useRef(new Map<string, string>());
     const rowRef = useRef<(HTMLTableRowElement | null)[]>([]);
     const headerRef = useRef<HTMLTableRowElement | null>(null);
@@ -76,7 +78,9 @@ const CSVView = ({ parentRef, filename, content }: CSVViewProps) => {
         // Check for non-header CSVs
         if (!hasHeaders && Array.isArray(results.data) && Array.isArray(results.data[0])) {
             const dataArray = results.data as string[][]; // Asserting the type
-            const headers = Array.from({ length: dataArray[0].length }, (_, i) => `Column ${i + 1}`);
+            const headers = Array.from({ length: dataArray[0].length }, (_, i) =>
+                t("preview.columnNumber", { num: i + 1 })
+            );
             results.data = dataArray.map((row) => {
                 const newRow: CSVRow = {};
                 row.forEach((value, index) => {
@@ -99,7 +103,7 @@ const CSVView = ({ parentRef, filename, content }: CSVViewProps) => {
                 })
             ) as CSVRow;
         });
-    }, [state.content]);
+    }, [state.content, t]);
 
     // Column Definitions
     const columns = useMemo(() => {

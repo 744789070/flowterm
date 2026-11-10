@@ -10,6 +10,7 @@ import {
 import { IconButton, ToggleIconButton } from "@/element/iconbutton";
 import { MagnifyIcon } from "@/element/magnify";
 import { MenuButton } from "@/element/menubutton";
+import { t, useT, type TranslationKey } from "@/i18n/i18n";
 import * as util from "@/util/util";
 import clsx from "clsx";
 import * as jotai from "jotai";
@@ -48,32 +49,36 @@ export function blockViewToIcon(view: string): string {
     return "square";
 }
 
-export function blockViewToName(view: string): string {
+const BlockViewNameKeys: { [view: string]: TranslationKey } = {
+    term: "views.terminal",
+    preview: "views.preview",
+    web: "views.web",
+    waveai: "views.waveai",
+    help: "views.help",
+    tips: "views.tips",
+    processviewer: "views.processes",
+    launcher: "views.widgetLauncher",
+    waveconfig: "views.waveConfig",
+    vdom: "views.waveApp",
+    tsunami: "views.waveApp",
+    cpuplot: "views.cpuPlot",
+    sysinfo: "views.sysinfo",
+    aifilediff: "views.aiFileDiff",
+};
+
+export function blockViewToNameKey(view: string): TranslationKey | null {
     if (util.isBlank(view)) {
-        return "(No View)";
+        return "views.noView";
     }
-    if (view == "term") {
-        return "Terminal";
+    return BlockViewNameKeys[view] ?? null;
+}
+
+export function blockViewToName(view: string): string {
+    const nameKey = blockViewToNameKey(view);
+    if (nameKey == null) {
+        return view;
     }
-    if (view == "preview") {
-        return "Preview";
-    }
-    if (view == "web") {
-        return "Web";
-    }
-    if (view == "waveai") {
-        return "WaveAI";
-    }
-    if (view == "help") {
-        return "Help";
-    }
-    if (view == "tips") {
-        return "Tips";
-    }
-    if (view == "processviewer") {
-        return "Processes";
-    }
-    return view;
+    return t(nameKey);
 }
 
 export function processTitleString(titleString: string): React.ReactNode[] {
@@ -212,10 +217,11 @@ export const Input = React.memo(
 
 export const OptMagnifyButton = React.memo(
     ({ magnified, toggleMagnify, disabled }: { magnified: boolean; toggleMagnify: () => void; disabled: boolean }) => {
+        const t = useT();
         const magnifyDecl: IconButtonDecl = {
             elemtype: "iconbutton",
             icon: <MagnifyIcon enabled={magnified} />,
-            title: magnified ? "Minimize" : "Magnify",
+            title: magnified ? t("blockframe.minimize") : t("blockframe.magnify"),
             click: toggleMagnify,
             disabled,
         };

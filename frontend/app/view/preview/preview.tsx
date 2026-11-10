@@ -5,6 +5,7 @@ import { CenteredDiv } from "@/app/element/quickelems";
 import { globalStore } from "@/app/store/jotaiStore";
 import { TabRpcClient } from "@/app/store/wshrpcutil";
 import { BlockHeaderSuggestionControl } from "@/app/suggestion/suggestion";
+import { useT } from "@/i18n/i18n";
 import { useWaveEnv } from "@/app/waveenv/waveenv";
 import { isBlank, makeConnRoute } from "@/util/util";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
@@ -49,6 +50,7 @@ const SpecializedView = memo(({ parentRef, model }: SpecializedViewProps) => {
     const mimeType = useAtomValue(model.fileMimeType);
     const setCanPreview = useSetAtom(model.canPreview);
     const path = useAtomValue(model.statFilePath);
+    const t = useT();
 
     useEffect(() => {
         setCanPreview(canPreview(mimeType));
@@ -59,7 +61,9 @@ const SpecializedView = memo(({ parentRef, model }: SpecializedViewProps) => {
     }
     const SpecializedViewComponent = SpecializedViewMap[specializedView.specializedView];
     if (!SpecializedViewComponent) {
-        return <CenteredDiv>Invalid Specialized View Component ({specializedView.specializedView})</CenteredDiv>;
+        return (
+            <CenteredDiv>{t("preview.invalidView", { view: specializedView.specializedView ?? "" })}</CenteredDiv>
+        );
     }
     return <SpecializedViewComponent key={path} model={model} parentRef={parentRef} />;
 });
@@ -111,6 +115,7 @@ function PreviewView({
     const [errorMsg, setErrorMsg] = useAtom(model.errorMsgAtom);
     const connection = useAtomValue(model.connectionImmediate);
     const fileInfo = useAtomValue(model.statFile);
+    const t = useT();
 
     useEffect(() => {
         console.log("fileInfo or connection changed", fileInfo, connection);
@@ -161,7 +166,7 @@ function PreviewView({
                 onSelect={handleSelect}
                 onTab={handleTab}
                 fetchSuggestions={fetchSuggestionsFn}
-                placeholderText="Open File..."
+                placeholderText={t("preview.openFile")}
             />
         </>
     );

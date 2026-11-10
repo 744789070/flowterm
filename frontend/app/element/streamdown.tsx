@@ -3,6 +3,7 @@
 
 import { CopyButton } from "@/app/element/copybutton";
 import { IconButton } from "@/app/element/iconbutton";
+import { useT } from "@/i18n/i18n";
 import { cn, useAtomValueSafe } from "@/util/util";
 import type { Atom } from "jotai";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -126,6 +127,7 @@ type CodeBlockProps = {
 
 const CodeBlock = ({ children, onClickExecute, codeBlockMaxWidthAtom }: CodeBlockProps) => {
     const codeBlockMaxWidth = useAtomValueSafe(codeBlockMaxWidthAtom);
+    const t = useT();
     const getLanguage = (children: any): string => {
         if (children?.props?.className) {
             const match = children.props.className.match(/language-([\w+-]+)/i);
@@ -161,7 +163,7 @@ const CodeBlock = ({ children, onClickExecute, codeBlockMaxWidthAtom }: CodeBloc
             <div className="flex items-center justify-between pl-3 pr-2 pt-2 pb-1.5">
                 <span className="text-[11px] text-white/50">{language}</span>
                 <div className="flex items-center gap-2">
-                    <CopyButton onClick={handleCopy} title="Copy" />
+                    <CopyButton onClick={handleCopy} title={t("common.copy")} />
                     {onClickExecute && (
                         <IconButton
                             decl={{

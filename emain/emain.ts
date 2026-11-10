@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { RpcApi } from "@/app/store/wshclientapi";
+import { normalizeLang, setLangOverride, t } from "@/i18n/i18n";
 import * as electron from "electron";
 import { focusedBuilderWindow, getAllBuilderWindows } from "emain/emain-builder";
 import { globalEvents } from "emain/emain-events";
@@ -59,6 +60,16 @@ import { getLaunchSettings } from "./launchsettings";
 import { configureAutoUpdater, updater } from "./updater";
 
 const electronApp = electron.app;
+
+// navigator.language is undefined in the main process; publish the OS display language so i18n
+// auto-detection works here too. getLocale() is safe pre-ready (needed for the wavesrv spawn env);
+// getSystemLocale() is more accurate but only callable post-ready, so refine once ready.
+process.env.WAVETERM_LOCALE = electron.app.getLocale();
+electronApp.whenReady().then(() => {
+    process.env.WAVETERM_LOCALE = electron.app.getSystemLocale();
+});
+// Windows 任务栏图标：dev 下 exe 是 electron.exe，必须设置 AUMID + 窗口 icon，任务栏才会显示自定义图标
+electronApp.setAppUserModelId("dev.flowterm.app");
 
 let confirmQuit = true;
 
@@ -277,9 +288,9 @@ electronApp.on("before-quit", (e) => {
         e.preventDefault();
         const choice = electron.dialog.showMessageBoxSync(null, {
             type: "question",
-            buttons: ["Cancel", "Quit"],
-            title: "Confirm Quit",
-            message: "Are you sure you want to quit Wave Terminal?",
+            buttons: [t("common.cancel"), t("common.quit")],
+            title: t("main.dialogs.confirmQuitTitle"),
+            message: t("main.dialogs.confirmQuitMessage"),
             defaultId: 0,
             cancelId: 0,
         });
@@ -410,6 +421,8 @@ async function appMain() {
         console.log("error initializing wshrpc", e);
     }
     const fullConfig = await RpcApi.GetFullConfigCommand(ElectronWshClient);
+    const langSetting = fullConfig?.settings?.["app:language"];
+    setLangOverride(langSetting != null && langSetting !== "" ? normalizeLang(langSetting) : null);
     checkIfRunningUnderARM64Translation(fullConfig);
     if (fullConfig?.settings?.["app:confirmquit"] != null) {
         confirmQuit = fullConfig.settings["app:confirmquit"];

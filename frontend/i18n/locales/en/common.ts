@@ -1,0 +1,42 @@
+// Copyright 2026, Command Line Inc.
+// SPDX-License-Identifier: Apache-2.0
+
+const common = {
+    cancel: "Cancel",
+    ok: "OK",
+    close: "Close",
+    copy: "Copy",
+    paste: "Paste",
+    cut: "Cut",
+    delete: "Delete",
+    rename: "Rename",
+    save: "Save",
+    settings: "Settings",
+    search: "Search",
+    loading: "Loading...",
+    error: "Error",
+    warning: "Warning",
+    add: "Add",
+    edit: "Edit",
+    open: "Open",
+    reset: "Reset",
+    done: "Done",
+    apply: "Apply",
+    confirm: "Confirm",
+    default: "Default",
+    none: "None",
+    more: "More",
+    selectAll: "Select All",
+    undo: "Undo",
+    redo: "Redo",
+    reload: "Reload",
+    quit: "Quit",
+    restart: "Restart",
+    later: "Later",
+    name: "Name",
+    yes: "Yes",
+    no: "No",
+    language: "Language",
+};
+
+export { common };

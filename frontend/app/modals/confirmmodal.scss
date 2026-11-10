@@ -1,0 +1,28 @@
+// Copyright 2026, Command Line Inc.
+// SPDX-License-Identifier: Apache-2.0
+
+.confirm-modal {
+    width: 400px;
+
+    .modal-close-btn {
+        display: none;
+    }
+
+    .modal-footer {
+        padding: 12px 20px 16px;
+        gap: 10px;
+
+        .wave-button {
+            min-width: 84px;
+        }
+
+        .wave-button:last-child {
+            margin-left: 0;
+        }
+    }
+}
+
+// 3-class selector to out-specify the base `.modal .content-wrapper .modal-content` rule
+.modal.confirm-modal .modal-content {
+    padding: 16px 20px 14px;
+}

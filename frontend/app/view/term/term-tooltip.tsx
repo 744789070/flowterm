@@ -1,6 +1,7 @@
 // Copyright 2025, Command Line Inc.
 // SPDX-License-Identifier: Apache-2.0
 
+import { useT } from "@/i18n/i18n";
 import { PLATFORM, PlatformMacOS } from "@/util/platformutil";
 import { FloatingPortal, VirtualElement, flip, offset, shift, useFloating } from "@floating-ui/react";
 import * as React from "react";
@@ -78,12 +79,13 @@ const MaxHoverTimeMs = 2200;
 const modKey = PLATFORM === PlatformMacOS ? "Cmd" : "Ctrl";
 
 export function TermLinkTooltipContent({ url }: { url?: string }) {
+    const t = useT();
     if (!url) {
-        return <span>{modKey}-click to open link</span>;
+        return <span>{t("term.modClickToOpenLink", { modKey })}</span>;
     }
     return (
         <div className="max-w-[min(28rem,80vw)]">
-            <div>{modKey}-click to open link</div>
+            <div>{t("term.modClickToOpenLink", { modKey })}</div>
             <div className="break-all">{url}</div>
         </div>
     );

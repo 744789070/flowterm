@@ -4,6 +4,7 @@
 import { dialog, ipcMain, Notification } from "electron";
 import { autoUpdater } from "electron-updater";
 import { readFileSync } from "fs";
+import { t } from "@/i18n/i18n";
 import path from "path";
 import YAML from "yaml";
 import { RpcApi } from "../frontend/app/store/wshclientapi";
@@ -93,8 +94,8 @@ export class Updater {
             // Display the update banner and create a system notification
             this.status = "ready";
             const updateNotification = new Notification({
-                title: "Wave Terminal",
-                body: "A new version of Wave Terminal is ready to install.",
+                title: t("main.updater.notificationTitle"),
+                body: t("main.updater.updateReady"),
             });
             updateNotification.on("click", () => {
                 fireAndForget(this.promptToInstallUpdate.bind(this));
@@ -163,7 +164,7 @@ export class Updater {
             if (userInput && !result.downloadPromise) {
                 const dialogOpts: Electron.MessageBoxOptions = {
                     type: "info",
-                    message: "There are currently no updates available.",
+                    message: t("main.updater.noUpdates"),
                 };
                 if (focusedWaveWindow) {
                     dialog.showMessageBox(focusedWaveWindow, dialogOpts);
@@ -181,10 +182,10 @@ export class Updater {
     async promptToInstallUpdate() {
         const dialogOpts: Electron.MessageBoxOptions = {
             type: "info",
-            buttons: ["Restart", "Later"],
-            title: "Application Update",
+            buttons: [t("main.updater.updateRestart"), t("common.later")],
+            title: t("main.updater.updateDialogTitle"),
             message: process.platform === "win32" ? this.availableUpdateReleaseNotes : this.availableUpdateReleaseName,
-            detail: "A new version has been downloaded. Restart the application to apply the updates.",
+            detail: t("main.updater.updateDetail"),
         };
 
         const allWindows = getAllWaveWindows();

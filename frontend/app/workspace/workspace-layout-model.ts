@@ -147,8 +147,9 @@ class WorkspaceLayoutModel {
             const savedAIWidth = globalStore.get(this.getPanelWidthAtom());
             const savedVTabWidth = globalStore.get(this.getVTabBarWidthAtom());
             if (savedVisible != null) {
-                this.aiPanelVisible = savedVisible;
-                globalStore.set(this.panelVisibleAtom, savedVisible);
+                // FlowTerm 已移除 Wave AI 面板：不再从 tab meta 恢复打开状态，一律保持关闭
+                this.aiPanelVisible = false;
+                globalStore.set(this.panelVisibleAtom, false);
             }
             if (savedAIWidth != null) {
                 this.aiPanelWidth = savedAIWidth;
@@ -386,6 +387,10 @@ class WorkspaceLayoutModel {
     // ---- Toggle visibility ----
 
     setAIPanelVisible(visible: boolean, opts?: { nofocus?: boolean }): void {
+        // FlowTerm 已移除 Wave AI 面板：任何入口都打不开它；关闭调用（visible=false）照常走清理逻辑
+        if (visible) {
+            return;
+        }
         if (this.focusTimeoutRef != null) {
             clearTimeout(this.focusTimeoutRef);
             this.focusTimeoutRef = null;

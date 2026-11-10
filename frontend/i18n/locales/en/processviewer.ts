@@ -1,0 +1,45 @@
+// Copyright 2026, Command Line Inc.
+// SPDX-License-Identifier: Apache-2.0
+
+const processviewer = {
+    col: {
+        pid: "PID",
+        command: "Command",
+        status: "Status",
+        user: "User",
+        threads: "NT",
+        threadsTooltip: "Num Threads",
+        cpu: "CPU%",
+        memory: "Memory",
+    },
+    refreshInterval: "Refresh Interval",
+    oneSecond: "1 second",
+    twoSeconds: "2 seconds",
+    fiveSeconds: "5 seconds",
+    paused: "Paused",
+    clickToResume: "Click to resume",
+    clickToPause: "Click to pause",
+    statusError: "Error",
+    statusStalled: "Stalled",
+    statusUpdating: "Updating",
+    errorWithMessage: "Error: {message}",
+    gone: "(gone)",
+    load: "Load",
+    mem: "Mem",
+    procs: "Procs",
+    procErr: "Err",
+    core: "core",
+    cores: "cores",
+    cpuTooltip: "100% per core · {num} {cores} = {max}% max",
+    searchTooltipCmd: "Search (Cmd-F)",
+    searchTooltipAlt: "Search (Alt-F)",
+    filterProcesses: "Filter processes…",
+    waitingForConnection: "Waiting for connection…",
+    copyPid: "Copy PID",
+    signal: "Signal",
+    killProcess: "Kill Process",
+    killedMessage: "Process #{pid} killed",
+    sentMessage: "Process #{pid} sent {signal}",
+};
+
+export { processviewer };

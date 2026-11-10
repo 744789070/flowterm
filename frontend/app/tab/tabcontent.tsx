@@ -3,6 +3,7 @@
 
 import { Block } from "@/app/block/block";
 import { CenteredDiv } from "@/element/quickelems";
+import { useT } from "@/i18n/i18n";
 import { ContentRenderer, NodeModel, PreviewRenderer, TileLayout } from "@/layout/index";
 import { TileLayoutContents } from "@/layout/lib/types";
 import { atoms, getApi } from "@/store/global";
@@ -18,6 +19,7 @@ const tileGapSizeAtom = atom((get) => {
 });
 
 const TabContent = React.memo(({ tabId, noTopPadding }: { tabId: string; noTopPadding?: boolean }) => {
+    const t = useT();
     const oref = useMemo(() => WOS.makeORef("tab", tabId), [tabId]);
     const loadingAtom = useMemo(() => WOS.getWaveObjectLoadingAtom(oref), [oref]);
     const tabLoading = useAtomValue(loadingAtom);
@@ -50,9 +52,9 @@ const TabContent = React.memo(({ tabId, noTopPadding }: { tabId: string; noTopPa
     let innerContent;
 
     if (tabLoading) {
-        innerContent = <CenteredDiv>Tab Loading</CenteredDiv>;
+        innerContent = <CenteredDiv>{t("tab.tabLoading")}</CenteredDiv>;
     } else if (!tabData) {
-        innerContent = <CenteredDiv>Tab Not Found</CenteredDiv>;
+        innerContent = <CenteredDiv>{t("tab.tabNotFound")}</CenteredDiv>;
     } else if (tabData?.blockids?.length == 0) {
         innerContent = null;
     } else {

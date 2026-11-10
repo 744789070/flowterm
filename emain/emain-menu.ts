@@ -4,6 +4,7 @@
 import { waveEventSubscribeSingle } from "@/app/store/wps";
 import { RpcApi } from "@/app/store/wshclientapi";
 import * as electron from "electron";
+import { normalizeLang, setLangOverride, t } from "@/i18n/i18n";
 import { fireAndForget } from "../frontend/util/util";
 import { focusedBuilderWindow, getBuilderWindowById } from "./emain-builder";
 import { openBuilderWindow } from "./emain-ipc";
@@ -49,7 +50,7 @@ async function getWorkspaceMenu(ww?: WaveBrowserWindow): Promise<Electron.MenuIt
     const workspaceList = await RpcApi.WorkspaceListCommand(ElectronWshClient);
     const workspaceMenu: Electron.MenuItemConstructorOptions[] = [
         {
-            label: "Create Workspace",
+            label: t("main.menu.createWorkspace"),
             click: (_, window) => fireAndForget(() => createWorkspace((window as WaveBrowserWindow) ?? ww)),
         },
     ];
@@ -92,34 +93,42 @@ function makeEditMenu(fullConfig?: FullConfigType): Electron.MenuItemConstructor
     return [
         {
             role: "undo",
+            label: t("common.undo"),
             accelerator: unamePlatform === "darwin" ? "Command+Z" : "",
         },
         {
             role: "redo",
+            label: t("common.redo"),
             accelerator: unamePlatform === "darwin" ? "Command+Shift+Z" : "",
         },
         { type: "separator" },
         {
             role: "cut",
+            label: t("common.cut"),
             accelerator: unamePlatform === "darwin" ? "Command+X" : "",
         },
         {
             role: "copy",
+            label: t("common.copy"),
             accelerator: unamePlatform === "darwin" ? "Command+C" : "",
         },
         {
             role: "paste",
+            label: t("common.paste"),
             accelerator: pasteAccelerator,
         },
         {
             role: "pasteAndMatchStyle",
+            label: t("main.menu.pasteAndMatchStyle"),
             accelerator: unamePlatform === "darwin" ? "Command+Shift+V" : "",
         },
         {
             role: "delete",
+            label: t("common.delete"),
         },
         {
             role: "selectAll",
+            label: t("common.selectAll"),
             accelerator: unamePlatform === "darwin" ? "Command+A" : "",
         },
     ];
@@ -132,12 +141,13 @@ function makeFileMenu(
 ): Electron.MenuItemConstructorOptions[] {
     const fileMenu: Electron.MenuItemConstructorOptions[] = [
         {
-            label: "New Window",
+            label: t("main.menu.newWindow"),
             accelerator: "CommandOrControl+Shift+N",
             click: () => fireAndForget(callbacks.createNewWaveWindow),
         },
         {
             role: "close",
+            label: t("main.menu.closeWindow"),
             accelerator: "",
             click: () => {
                 focusedWaveWindow?.close();
@@ -147,7 +157,7 @@ function makeFileMenu(
     const featureWaveAppBuilder = fullConfig?.settings?.["feature:waveappbuilder"];
     if (isDev || featureWaveAppBuilder) {
         fileMenu.splice(1, 0, {
-            label: "New WaveApp Builder Window",
+            label: t("main.menu.newWaveAppBuilderWindow"),
             accelerator: unamePlatform === "darwin" ? "Command+Shift+B" : "Alt+Shift+B",
             click: () => openBuilderWindow(""),
         });
@@ -174,13 +184,13 @@ function makeFileMenu(
 function makeAppMenuItems(webContents: electron.WebContents): Electron.MenuItemConstructorOptions[] {
     const appMenuItems: Electron.MenuItemConstructorOptions[] = [
         {
-            label: "About Wave Terminal",
+            label: t("main.menu.about"),
             click: (_, window) => {
                 (getWindowWebContents(window) ?? webContents)?.send("menu-item-about");
             },
         },
         {
-            label: "Check for Updates",
+            label: t("main.menu.checkForUpdates"),
             click: () => {
                 fireAndForget(() => updater?.checkForUpdates(true));
             },
@@ -189,14 +199,14 @@ function makeAppMenuItems(webContents: electron.WebContents): Electron.MenuItemC
     ];
     if (unamePlatform === "darwin") {
         appMenuItems.push(
-            { role: "services" },
+            { role: "services", label: t("main.menu.services") },
             { type: "separator" },
-            { role: "hide" },
-            { role: "hideOthers" },
+            { role: "hide", label: t("main.menu.hide") },
+            { role: "hideOthers", label: t("main.menu.hideOthers") },
             { type: "separator" }
         );
     }
-    appMenuItems.push({ role: "quit" });
+    appMenuItems.push({ role: "quit", label: t("common.quit") });
     return appMenuItems;
 }
 
@@ -209,22 +219,22 @@ function makeViewMenu(
     const devToolsAccel = unamePlatform === "darwin" ? "Option+Command+I" : "Alt+Shift+I";
     return [
         {
-            label: isBuilderWindowFocused ? "Reload Window" : "Reload Tab",
+            label: isBuilderWindowFocused ? t("main.menu.reloadWindow") : t("main.menu.reloadTab"),
             accelerator: "Shift+CommandOrControl+R",
             click: (_, window) => {
                 (getWindowWebContents(window) ?? webContents)?.reloadIgnoringCache();
             },
         },
         {
-            label: "Relaunch All Windows",
+            label: t("main.menu.relaunchAllWindows"),
             click: () => callbacks.relaunchBrowserWindows(),
         },
         {
-            label: "Clear Tab Cache",
+            label: t("main.menu.clearTabCache"),
             click: () => clearTabCache(),
         },
         {
-            label: "Toggle DevTools",
+            label: t("main.menu.toggleDevTools"),
             accelerator: devToolsAccel,
             click: (_, window) => {
                 const wc = getWindowWebContents(window) ?? webContents;
@@ -233,7 +243,7 @@ function makeViewMenu(
         },
         { type: "separator" },
         {
-            label: "Reset Zoom",
+            label: t("main.menu.resetZoom"),
             accelerator: "CommandOrControl+0",
             click: (_, window) => {
                 const wc = getWindowWebContents(window) ?? webContents;
@@ -243,7 +253,7 @@ function makeViewMenu(
             },
         },
         {
-            label: "Zoom In",
+            label: t("main.menu.zoomIn"),
             accelerator: "CommandOrControl+=",
             click: (_, window) => {
                 const wc = getWindowWebContents(window) ?? webContents;
@@ -253,7 +263,7 @@ function makeViewMenu(
             },
         },
         {
-            label: "Zoom In (hidden)",
+            label: t("main.menu.zoomInHidden"),
             accelerator: "CommandOrControl+Shift+=",
             click: (_, window) => {
                 const wc = getWindowWebContents(window) ?? webContents;
@@ -265,7 +275,7 @@ function makeViewMenu(
             acceleratorWorksWhenHidden: true,
         },
         {
-            label: "Zoom Out",
+            label: t("main.menu.zoomOut"),
             accelerator: "CommandOrControl+-",
             click: (_, window) => {
                 const wc = getWindowWebContents(window) ?? webContents;
@@ -275,7 +285,7 @@ function makeViewMenu(
             },
         },
         {
-            label: "Zoom Out (hidden)",
+            label: t("main.menu.zoomOutHidden"),
             accelerator: "CommandOrControl+Shift+-",
             click: (_, window) => {
                 const wc = getWindowWebContents(window) ?? webContents;
@@ -287,10 +297,10 @@ function makeViewMenu(
             acceleratorWorksWhenHidden: true,
         },
         {
-            label: "Launch On Full Screen",
+            label: t("main.menu.launchOnFullScreen"),
             submenu: [
                 {
-                    label: "On",
+                    label: t("main.menu.on"),
                     type: "radio",
                     checked: fullscreenOnLaunch,
                     click: () => {
@@ -298,7 +308,7 @@ function makeViewMenu(
                     },
                 },
                 {
-                    label: "Off",
+                    label: t("main.menu.off"),
                     type: "radio",
                     checked: !fullscreenOnLaunch,
                     click: () => {
@@ -310,10 +320,11 @@ function makeViewMenu(
         { type: "separator" },
         {
             role: "togglefullscreen",
+            label: t("main.menu.toggleFullScreen"),
         },
         { type: "separator" },
         {
-            label: "Toggle Widgets Bar",
+            label: t("main.menu.toggleWidgetsBar"),
             click: () => {
                 fireAndForget(async () => {
                     const workspaceId = focusedWaveWindow?.workspaceId;
@@ -352,26 +363,27 @@ async function makeFullAppMenu(callbacks: AppMenuCallbacks, workspaceOrBuilderId
         console.error("getWorkspaceMenu error:", e);
     }
     const windowMenu: Electron.MenuItemConstructorOptions[] = [
-        { role: "minimize", accelerator: "" },
-        { role: "zoom" },
+        { role: "minimize", label: t("main.menu.minimize"), accelerator: "" },
+        { role: "zoom", label: t("main.menu.zoom") },
         { type: "separator" },
-        { role: "front" },
+        { role: "front", label: t("main.menu.front") },
     ];
     const menuTemplate: Electron.MenuItemConstructorOptions[] = [
         { role: "appMenu", submenu: appMenuItems },
-        { role: "fileMenu", submenu: fileMenu },
-        { role: "editMenu", submenu: editMenu },
-        { role: "viewMenu", submenu: viewMenu },
+        { role: "fileMenu", label: t("main.menu.file"), submenu: fileMenu },
+        { role: "editMenu", label: t("main.menu.edit"), submenu: editMenu },
+        { role: "viewMenu", label: t("main.menu.view"), submenu: viewMenu },
     ];
     if (workspaceMenu != null && !isBuilderWindowFocused) {
         menuTemplate.push({
-            label: "Workspace",
+            label: t("main.menu.workspace"),
             id: "workspace-menu",
             submenu: workspaceMenu,
         });
     }
     menuTemplate.push({
         role: "windowMenu",
+        label: t("main.menu.window"),
         submenu: windowMenu,
     });
     return electron.Menu.buildFromTemplate(menuTemplate);
@@ -402,6 +414,18 @@ function initMenuEventSubscriptions() {
     waveEventSubscribeSingle({
         eventType: "workspace:update",
         handler: makeAndSetAppMenu,
+    });
+    waveEventSubscribeSingle({
+        eventType: "config",
+        handler: (event) => {
+            try {
+                const langSetting = event?.data?.fullconfig?.settings?.["app:language"];
+                setLangOverride(langSetting != null && langSetting !== "" ? normalizeLang(langSetting) : null);
+                makeAndSetAppMenu();
+            } catch (e) {
+                console.log("error handling config event for language", e);
+            }
+        },
     });
 }
 
@@ -501,18 +525,20 @@ electron.ipcMain.on("builder-appmenu-show", (event, builderId: string) => {
     event.returnValue = true;
 });
 
-const dockMenu = electron.Menu.buildFromTemplate([
-    {
-        label: "New Window",
-        click() {
-            fireAndForget(createNewWaveWindow);
+function makeDockMenu() {
+    return electron.Menu.buildFromTemplate([
+        {
+            label: t("main.menu.newWindow"),
+            click() {
+                fireAndForget(createNewWaveWindow);
+            },
         },
-    },
-]);
+    ]);
+}
 
 function makeDockTaskbar() {
     if (unamePlatform == "darwin") {
-        electron.app.dock.setMenu(dockMenu);
+        electron.app.dock.setMenu(makeDockMenu());
     }
 }
 

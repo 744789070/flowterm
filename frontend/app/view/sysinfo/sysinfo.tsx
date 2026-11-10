@@ -15,6 +15,8 @@ import { useDimensionsWithExistingRef } from "@/app/hook/useDimensions";
 import { waveEventSubscribeSingle } from "@/app/store/wps";
 import { TabRpcClient } from "@/app/store/wshrpcutil";
 import type { MetaKeyAtomFnType, WaveEnv, WaveEnvSubset } from "@/app/waveenv/waveenv";
+import { resolvedLangAtom, t, tLang, type TranslationKey } from "@/i18n/i18n";
+import type { UiLang } from "@/i18n/types";
 import { OverlayScrollbarsComponent, OverlayScrollbarsComponentRef } from "overlayscrollbars-react";
 
 export type SysinfoEnv = WaveEnvSubset<{
@@ -79,15 +81,33 @@ const PlotTypes: object = {
     },
 };
 
-const DefaultPlotMeta = {
-    cpu: defaultCpuMeta("CPU %"),
-    "mem:total": defaultMemMeta("Memory Total", "mem:total"),
-    "mem:used": defaultMemMeta("Memory Used", "mem:total"),
-    "mem:free": defaultMemMeta("Memory Free", "mem:total"),
-    "mem:available": defaultMemMeta("Memory Available", "mem:total"),
+const PlotTypeLabelKeys: { [plotType: string]: TranslationKey } = {
+    CPU: "sysinfo.plotTypes.cpu",
+    Mem: "sysinfo.plotTypes.mem",
+    "CPU + Mem": "sysinfo.plotTypes.cpuMem",
+    "All CPU": "sysinfo.plotTypes.allCpu",
 };
-for (let i = 0; i < 32; i++) {
-    DefaultPlotMeta[`cpu:${i}`] = defaultCpuMeta(`Core ${i}`);
+
+function plotTypeLabel(lang: UiLang, plotType: string): string {
+    const labelKey = PlotTypeLabelKeys[plotType];
+    if (labelKey == null) {
+        return plotType;
+    }
+    return tLang(lang, labelKey);
+}
+
+function buildDefaultPlotMeta(lang: UiLang): Map<string, TimeSeriesMeta> {
+    const meta = new Map<string, TimeSeriesMeta>([
+        ["cpu", defaultCpuMeta(tLang(lang, "sysinfo.cpuPercent"))],
+        ["mem:total", defaultMemMeta(tLang(lang, "sysinfo.memoryTotal"), "mem:total")],
+        ["mem:used", defaultMemMeta(tLang(lang, "sysinfo.memoryUsed"), "mem:total")],
+        ["mem:free", defaultMemMeta(tLang(lang, "sysinfo.memoryFree"), "mem:total")],
+        ["mem:available", defaultMemMeta(tLang(lang, "sysinfo.memoryAvailable"), "mem:total")],
+    ]);
+    for (let i = 0; i < 32; i++) {
+        meta.set(`cpu:${i}`, defaultCpuMeta(tLang(lang, "sysinfo.core", { num: i })));
+    }
+    return meta;
 }
 
 function convertWaveEventToDataItem(event: Extract<WaveEvent, { event: "sysinfo" }>): DataItem {
@@ -121,7 +141,7 @@ class SysinfoViewModel implements ViewModel {
     manageConnection: jotai.Atom<boolean>;
     filterOutNowsh: jotai.Atom<boolean>;
     connStatus: jotai.Atom<ConnStatus>;
-    plotMetaAtom: jotai.PrimitiveAtom<Map<string, TimeSeriesMeta>>;
+    plotMetaAtom: jotai.Atom<Map<string, TimeSeriesMeta>>;
     endIconButtons: jotai.Atom<IconButtonDecl[]>;
     plotTypeSelectedAtom: jotai.Atom<string>;
     env: SysinfoEnv;
@@ -186,7 +206,7 @@ class SysinfoViewModel implements ViewModel {
                 console.log("Error adding data to sysinfo", e);
             }
         });
-        this.plotMetaAtom = jotai.atom(new Map(Object.entries(DefaultPlotMeta)));
+        this.plotMetaAtom = jotai.atom((get) => buildDefaultPlotMeta(get(resolvedLangAtom)));
         this.manageConnection = jotai.atom(true);
         this.filterOutNowsh = jotai.atom(true);
         this.loadingAtom = jotai.atom(true);
@@ -221,7 +241,7 @@ class SysinfoViewModel implements ViewModel {
             return "chart-line"; // should not be hardcoded
         });
         this.viewName = jotai.atom((get) => {
-            return get(this.plotTypeSelectedAtom);
+            return plotTypeLabel(get(resolvedLangAtom), get(this.plotTypeSelectedAtom));
         });
         this.incrementCount = jotai.atom(null, async (get, _set) => {
             const count = get(this.env.getBlockMetaKeyAtom(blockId, "count")) ?? 0;
@@ -292,8 +312,9 @@ class SysinfoViewModel implements ViewModel {
             submenu = Object.keys(PlotTypes).map((plotType) => {
                 const dataTypes = PlotTypes[plotType](plotData[plotData.length - 1]);
                 const currentlySelected = globalStore.get(this.plotTypeSelectedAtom);
+                const labelKey = PlotTypeLabelKeys[plotType];
                 const menuItem: ContextMenuItem = {
-                    label: plotType,
+                    label: labelKey != null ? t(labelKey) : plotType,
                     type: "radio",
                     checked: currentlySelected == plotType,
                     click: async () => {
@@ -308,7 +329,7 @@ class SysinfoViewModel implements ViewModel {
         }
 
         fullMenu.push({
-            label: "Plot Type",
+            label: t("sysinfo.plotType"),
             submenu: submenu,
         });
         fullMenu.push({ type: "separator" });

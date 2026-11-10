@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { makeIconClass } from "@/util/util";
+import { t } from "@/i18n/i18n";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import clsx from "clsx";
 import React, {
@@ -143,7 +144,7 @@ export function buildVisibleRows(
                 parentId: id,
                 depth: depth + 1,
                 kind: "loading",
-                label: "Loading…",
+                label: t("contextmenu.treeLoading"),
             });
             return;
         }
@@ -153,7 +154,9 @@ export function buildVisibleRows(
                 parentId: id,
                 depth: depth + 1,
                 kind: "error",
-                label: node.staterror ? `Error: ${node.staterror}` : "Unable to load directory",
+                label: node.staterror
+                    ? t("contextmenu.treeLoadError", { msg: node.staterror })
+                    : t("contextmenu.treeUnableToLoadDir"),
             });
             return;
         }
@@ -167,7 +170,7 @@ export function buildVisibleRows(
                 parentId: id,
                 depth: depth + 1,
                 kind: "capped",
-                label: `Showing first ${capMax} entries`,
+                label: t("contextmenu.treeShowingFirstEntries", { count: capMax }),
             });
         }
     };
@@ -327,7 +330,7 @@ export const TreeView = forwardRef<TreeViewRef, TreeViewProps>((props, ref) => {
                 next.set(id, {
                     ...source,
                     childrenStatus: "error",
-                    staterror: error instanceof Error ? error.message : "Unknown error",
+                    staterror: error instanceof Error ? error.message : t("contextmenu.treeUnknownError"),
                 });
                 return next;
             });
