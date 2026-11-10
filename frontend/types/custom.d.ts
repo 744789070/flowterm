@@ -114,6 +114,8 @@ declare global {
         createWorkspace: () => void; // create-workspace
         switchWorkspace: (workspaceId: string) => void; // switch-workspace
         deleteWorkspace: (workspaceId: string) => void; // delete-workspace
+        onModalConfirmRequest: (callback: (data: ModalConfirmRequest) => void) => void; // modal-confirm-request
+        resolveModalConfirm: (id: string, ok: boolean) => void; // modal-confirm-response
         setActiveTab: (tabId: string) => void; // set-active-tab
         createTab: () => void; // create-tab
         closeTab: (workspaceId: string, tabId: string, confirmClose: boolean) => Promise<boolean>; // close-tab
@@ -160,6 +162,14 @@ declare global {
         visible?: boolean;
         enabled?: boolean;
         sublabel?: string;
+    };
+
+    type ModalConfirmRequest = {
+        id: string;
+        title?: string;
+        message: string;
+        okLabel?: string;
+        cancelLabel?: string;
     };
 
     type KeyPressDecl = {

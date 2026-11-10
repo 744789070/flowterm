@@ -2,9 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Tooltip } from "@/app/element/tooltip";
+import { confirmModalPromise } from "@/app/modals/confirmmodal";
 import { TabRpcClient } from "@/app/store/wshrpcutil";
 import { useWaveEnv } from "@/app/waveenv/waveenv";
-import { WorkspaceLayoutModel } from "@/app/workspace/workspace-layout-model";
+import { useT } from "@/i18n/i18n";
 import { deleteLayoutModelForTab } from "@/layout/index";
 import { isMacOSTahoeOrLater } from "@/util/platformutil";
 import { fireAndForget } from "@/util/util";
@@ -46,32 +47,9 @@ interface TabBarProps {
 }
 
 const WaveAIButton = memo(({ divRef }: { divRef?: React.RefObject<HTMLDivElement> }) => {
-    const env = useWaveEnv<TabBarEnv>();
-    const aiPanelOpen = useAtomValue(WorkspaceLayoutModel.getInstance().panelVisibleAtom);
-    const hideAiButton = useAtomValue(env.getSettingsKeyAtom("app:hideaibutton"));
-
-    const onClick = () => {
-        const currentVisible = WorkspaceLayoutModel.getInstance().getAIPanelVisible();
-        WorkspaceLayoutModel.getInstance().setAIPanelVisible(!currentVisible);
-    };
-
-    if (hideAiButton) {
-        return null;
-    }
-
-    return (
-        <Tooltip
-            content="Toggle Wave AI Panel"
-            placement="bottom"
-            hideOnClick
-            divClassName={`flex h-[22px] px-3.5 justify-end mb-1 items-center rounded-md mr-1 box-border cursor-pointer bg-hover hover:bg-hoverbg transition-colors text-[12px] ${aiPanelOpen ? "text-accent" : "text-secondary"}`}
-            divStyle={{ WebkitAppRegion: "no-drag" } as React.CSSProperties}
-            divOnClick={onClick}
-            divRef={divRef}
-        >
-            <i className="fa fa-sparkles" />
-        </Tooltip>
-    );
+    // FlowTerm 已移除 Wave AI 面板：按钮不再渲染
+    void divRef;
+    return null;
 });
 WaveAIButton.displayName = "WaveAIButton";
 
@@ -96,6 +74,7 @@ function strArrayIsEqual(a: string[], b: string[]) {
 
 const TabBar = memo(({ workspace, noTabs }: TabBarProps) => {
     const env = useWaveEnv<TabBarEnv>();
+    const t = useT();
     const [tabIds, setTabIds] = useState<string[]>([]);
     const [dragStartPositions, setDragStartPositions] = useState<number[]>([]);
     const [draggingTab, setDraggingTab] = useState<string>();
@@ -541,17 +520,22 @@ const TabBar = memo(({ workspace, noTabs }: TabBarProps) => {
 
     const handleCloseTab = (event: React.MouseEvent<HTMLButtonElement, MouseEvent> | null, tabId: string) => {
         event?.stopPropagation();
-        env.electron
-            .closeTab(workspace.oid, tabId, confirmClose)
-            .then((didClose) => {
-                if (didClose) {
-                    tabsWrapperRef.current?.style.setProperty("--tabs-wrapper-transition", "width 0.3s ease");
-                    deleteLayoutModelForTab(tabId);
+        fireAndForget(async () => {
+            if (confirmClose) {
+                const ok = await confirmModalPromise(t("main.dialogs.closeTabMessage"), {
+                    title: t("main.dialogs.confirmTitle"),
+                    okLabel: t("main.dialogs.closeTabButton"),
+                });
+                if (!ok) {
+                    return;
                 }
-            })
-            .catch((e) => {
-                console.log("error closing tab", e);
-            });
+            }
+            const didClose = await env.electron.closeTab(workspace.oid, tabId, false);
+            if (didClose) {
+                tabsWrapperRef.current?.style.setProperty("--tabs-wrapper-transition", "width 0.3s ease");
+                deleteLayoutModelForTab(tabId);
+            }
+        });
     };
 
     const handleTabLoaded = useCallback((tabId: string) => {
@@ -615,7 +599,7 @@ const TabBar = memo(({ workspace, noTabs }: TabBarProps) => {
             )}
             <WaveAIButton divRef={waveAIButtonRef} />
             <Tooltip
-                content="Workspace Switcher"
+                content={t("workspace.workspaceSwitcher")}
                 placement="bottom"
                 hideOnClick
                 divRef={workspaceSwitcherRef}
@@ -657,7 +641,7 @@ const TabBar = memo(({ workspace, noTabs }: TabBarProps) => {
             </div>
             <button
                 ref={addBtnRef}
-                title="Add Tab"
+                title={t("tab.addTab")}
                 className={`flex h-[22px] px-2 mb-1 mx-1 items-center rounded-md box-border cursor-pointer hover:bg-hoverbg transition-colors text-[12px] text-secondary hover:text-primary${noTabs ? " invisible" : ""}`}
                 style={{ WebkitAppRegion: "no-drag" } as React.CSSProperties}
                 onClick={handleAddTab}

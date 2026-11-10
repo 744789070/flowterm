@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { AIPanel } from "@/app/aipanel/aipanel";
+import { ConfirmModalHost } from "@/app/modals/confirmmodal";
 import { ErrorBoundary } from "@/app/element/errorboundary";
 import { CenteredDiv } from "@/app/element/quickelems";
 import { ModalsRenderer } from "@/app/modals/modalsrenderer";
@@ -10,6 +11,7 @@ import { TabContent } from "@/app/tab/tabcontent";
 import { VTabBar } from "@/app/tab/vtabbar";
 import { Widgets } from "@/app/workspace/widgets";
 import { WorkspaceLayoutModel } from "@/app/workspace/workspace-layout-model";
+import { useT } from "@/i18n/i18n";
 import { atoms, getApi, getSettingsKeyAtom } from "@/store/global";
 import { isMacOS } from "@/util/platformutil";
 import { useAtomValue } from "jotai";
@@ -41,6 +43,7 @@ MacOSTabBarSpacer.displayName = "MacOSTabBarSpacer";
 
 const WorkspaceElem = memo(() => {
     const workspaceLayoutModel = WorkspaceLayoutModel.getInstance();
+    const t = useT();
     const tabId = useAtomValue(atoms.staticTabId);
     const ws = useAtomValue(atoms.workspace);
     const tabBarPosition = useAtomValue(getSettingsKeyAtom("app:tabbar")) ?? "top";
@@ -155,7 +158,7 @@ const WorkspaceElem = memo(() => {
                         <PanelResizeHandle className={outerHandleClass} />
                         <Panel order={1} defaultSize={100 - leftGroupInitialPct}>
                             {tabId === "" ? (
-                                <CenteredDiv>No Active Tab</CenteredDiv>
+                                <CenteredDiv>{t("workspace.noActiveTab")}</CenteredDiv>
                             ) : (
                                 <div className="flex flex-row h-full">
                                     <TabContent key={tabId} tabId={tabId} noTopPadding={showLeftTabBar && isMacOS()} />
@@ -165,6 +168,7 @@ const WorkspaceElem = memo(() => {
                         </Panel>
                     </PanelGroup>
                     <ModalsRenderer />
+                    <ConfirmModalHost />
                 </ErrorBoundary>
             </div>
         </div>

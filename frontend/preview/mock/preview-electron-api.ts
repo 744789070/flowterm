@@ -38,6 +38,8 @@ const previewElectronApi: ElectronApi = {
     createWorkspace: () => {},
     switchWorkspace: (_workspaceId: string) => {},
     deleteWorkspace: (_workspaceId: string) => {},
+    onModalConfirmRequest: (_callback: (data: ModalConfirmRequest) => void) => {},
+    resolveModalConfirm: (_id: string, _ok: boolean) => {},
     setActiveTab: (_tabId: string) => {},
     createTab: () => {},
     closeTab: (_workspaceId: string, _tabId: string, _confirmClose: boolean) => Promise.resolve(false),

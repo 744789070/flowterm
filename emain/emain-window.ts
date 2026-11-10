@@ -4,6 +4,7 @@
 import { ClientService, ObjectService, WindowService, WorkspaceService } from "@/app/store/services";
 import { waveEventSubscribeSingle } from "@/app/store/wps";
 import { RpcApi } from "@/app/store/wshclientapi";
+import { t } from "@/i18n/i18n";
 import { fireAndForget } from "@/util/util";
 import { BaseWindow, BaseWindowConstructorOptions, dialog, globalShortcut, ipcMain, screen, webContents } from "electron";
 import { globalEvents } from "emain/emain-events";
@@ -17,7 +18,7 @@ import {
     setWasInFg,
 } from "./emain-activity";
 import { log } from "./emain-log";
-import { getElectronAppBasePath, isDev, unamePlatform } from "./emain-platform";
+import { getWaveAppIconPath, isDev, unamePlatform } from "./emain-platform";
 import { getOrCreateWebViewForTab, getWaveTabViewByWebContentsId, WaveTabView } from "./emain-tabview";
 import { delay, ensureBoundsAreVisible, waveKeyToElectronKey } from "./emain-util";
 import { ElectronWshClient } from "./emain-wsh";
@@ -144,6 +145,36 @@ function isNonEmptyUnsavedWorkspace(workspace: Workspace): boolean {
     return !workspace.name && !workspace.icon && workspace.tabids?.length > 1;
 }
 
+// asks the window's renderer to show a framework-styled confirm modal and resolves with the choice.
+// falls back to cancel (false) if there is no renderer or it does not respond in time.
+function rendererConfirmDialog(
+    ww: WaveBrowserWindow,
+    opts: { title?: string; message: string; okLabel?: string; cancelLabel?: string }
+): Promise<boolean> {
+    return new Promise((resolve) => {
+        const wc = ww.activeTabView?.webContents;
+        if (wc == null || wc.isDestroyed()) {
+            resolve(false);
+            return;
+        }
+        const reqId = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+        const timer = setTimeout(() => {
+            ipcMain.removeListener("modal-confirm-response", listener);
+            resolve(false);
+        }, 15000);
+        const listener = (_event: Electron.IpcMainEvent, respId: string, ok: boolean) => {
+            if (respId !== reqId) {
+                return;
+            }
+            clearTimeout(timer);
+            ipcMain.removeListener("modal-confirm-response", listener);
+            resolve(ok);
+        };
+        ipcMain.on("modal-confirm-response", listener);
+        wc.send("modal-confirm-request", { id: reqId, ...opts });
+    });
+}
+
 export class WaveBrowserWindow extends BaseWindow {
     waveWindowId: string;
     workspaceId: string;
@@ -189,7 +220,7 @@ export class WaveBrowserWindow extends BaseWindow {
                 symbolColor: "white",
                 color: "#00000000",
             };
-            winOpts.icon = path.join(getElectronAppBasePath(), "public/logos/wave-logo-dark.png");
+            winOpts.icon = getWaveAppIconPath();
             winOpts.autoHideMenuBar = !settings?.["window:showmenubar"];
             if (isTransparent) {
                 winOpts.transparent = true;
@@ -308,22 +339,25 @@ export class WaveBrowserWindow extends BaseWindow {
             fireAndForget(async () => {
                 const numWindows = waveWindowMap.size;
                 const fullConfig = await RpcApi.GetFullConfigCommand(ElectronWshClient);
-                if (numWindows > 1 || !fullConfig.settings["window:savelastwindow"]) {
-                    if (fullConfig.settings["window:confirmclose"]) {
-                        const workspace = await WorkspaceService.GetWorkspace(this.workspaceId);
-                        if (isNonEmptyUnsavedWorkspace(workspace)) {
-                            const choice = dialog.showMessageBoxSync(this, {
-                                type: "question",
-                                buttons: ["Cancel", "Close Window"],
-                                title: "Confirm",
-                                message:
-                                    "Window has unsaved tabs, closing window will delete existing tabs.\n\nContinue?",
-                            });
-                            if (choice === 0) {
-                                return;
-                            }
+                const workspace = await WorkspaceService.GetWorkspace(this.workspaceId);
+                // closing a window kills all its tabs and running terminals; upstream only confirmed
+                // unnamed multi-tab workspaces with >1 windows, so the last window (or any named
+                // workspace) closed silently with no confirmation at all
+                if (fullConfig.settings["window:confirmclose"]) {
+                    const hasTabs = workspace?.tabids?.length > 0;
+                    if (isNonEmptyUnsavedWorkspace(workspace) || hasTabs) {
+                        const ok = await rendererConfirmDialog(this, {
+                            title: t("main.dialogs.confirmTitle"),
+                            message: t("main.dialogs.windowUnsavedTabsMessage"),
+                            okLabel: t("main.menu.closeWindow"),
+                            cancelLabel: t("common.cancel"),
+                        });
+                        if (!ok) {
+                            return;
                         }
                     }
+                }
+                if (numWindows > 1 || !fullConfig.settings["window:savelastwindow"]) {
                     this.deleteAllowed = true;
                 }
                 this.canClose = true;
@@ -794,9 +828,9 @@ ipcMain.handle("close-tab", async (event, workspaceId: string, tabId: string, co
             type: "question",
             defaultId: 1, // Enter activates "Close Tab"
             cancelId: 0, // Esc activates "Cancel"
-            buttons: ["Cancel", "Close Tab"],
-            title: "Confirm",
-            message: "Are you sure you want to close this tab?",
+            buttons: [t("common.cancel"), t("main.dialogs.closeTabButton")],
+            title: t("main.dialogs.confirmTitle"),
+            message: t("main.dialogs.closeTabMessage"),
         });
         if (choice === 0) {
             return false;
@@ -842,17 +876,7 @@ ipcMain.on("delete-workspace", (event, workspaceId) => {
 
         const _workspaceHasWindow = !!workspaceList.find((wse) => wse.workspaceid === workspaceId)?.windowid;
 
-        const choice = dialog.showMessageBoxSync(this, {
-            type: "question",
-            buttons: ["Cancel", "Delete Workspace"],
-            title: "Confirm",
-            message: `Deleting workspace will also delete its contents.\n\nContinue?`,
-        });
-        if (choice === 0) {
-            console.log("user cancelled workspace delete", workspaceId, ww?.waveWindowId);
-            return;
-        }
-
+        // the renderer shows the framework-styled confirm modal before sending delete-workspace
         const newWorkspaceId = await WorkspaceService.DeleteWorkspace(workspaceId);
         console.log("delete-workspace done", workspaceId, ww?.waveWindowId);
         if (ww?.workspaceId == workspaceId) {

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { WaveAIModel } from "@/app/aipanel/waveai-model";
+import { confirmModalPromise } from "@/app/modals/confirmmodal";
 import { FocusManager } from "@/app/store/focusManager";
 import {
     atoms,
@@ -22,6 +23,7 @@ import {
 } from "@/app/store/global";
 import { getActiveTabModel } from "@/app/store/tab-model";
 import { WorkspaceLayoutModel } from "@/app/workspace/workspace-layout-model";
+import { t } from "@/i18n/i18n";
 import { deleteLayoutModelForTab, getLayoutModelForStaticTab, NavigateDirection } from "@/layout/index";
 import * as keyutil from "@/util/keyutil";
 import { isWindows } from "@/util/platformutil";
@@ -132,16 +134,21 @@ function simpleCloseStaticTab() {
     const workspaceId = globalStore.get(atoms.workspaceId);
     const tabId = globalStore.get(atoms.staticTabId);
     const confirmClose = globalStore.get(getSettingsKeyAtom("tab:confirmclose")) ?? false;
-    getApi()
-        .closeTab(workspaceId, tabId, confirmClose)
-        .then((didClose) => {
-            if (didClose) {
-                deleteLayoutModelForTab(tabId);
+    fireAndForget(async () => {
+        if (confirmClose) {
+            const ok = await confirmModalPromise(t("main.dialogs.closeTabMessage"), {
+                title: t("main.dialogs.confirmTitle"),
+                okLabel: t("main.dialogs.closeTabButton"),
+            });
+            if (!ok) {
+                return;
             }
-        })
-        .catch((e) => {
-            console.log("error closing tab", e);
-        });
+        }
+        const didClose = await getApi().closeTab(workspaceId, tabId, false);
+        if (didClose) {
+            deleteLayoutModelForTab(tabId);
+        }
+    });
 }
 
 function uxCloseBlock(blockId: string) {
@@ -739,11 +746,6 @@ function registerGlobalKeys() {
             return true;
         }
         return false;
-    });
-    globalKeyMap.set("Cmd:Shift:a", () => {
-        const currentVisible = WorkspaceLayoutModel.getInstance().getAIPanelVisible();
-        WorkspaceLayoutModel.getInstance().setAIPanelVisible(!currentVisible);
-        return true;
     });
     const allKeys = Array.from(globalKeyMap.keys());
     // special case keys, handled by web view
