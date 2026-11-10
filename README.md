@@ -1,119 +1,68 @@
-> **FlowTerm** is a secondary-development fork of [Wave Terminal](https://github.com/wavetermdev/waveterm) (Apache-2.0, © Command Line Inc). All original license notices are preserved in [LICENSE](LICENSE) and [NOTICE](NOTICE). For architecture overview, dev setup, and extension guides, see the [secondary-development guide (二次开发指南)](DEVELOPMENT.md).
-
 <p align="center">
-  <a href="https://www.waveterm.dev">
-	<picture>
-		<source media="(prefers-color-scheme: dark)" srcset="./assets/wave-dark.png">
-		<source media="(prefers-color-scheme: light)" srcset="./assets/wave-light.png">
-		<img alt="Wave Terminal Logo" src="./assets/wave-light.png" width="240">
-	</picture>
+  <a href="https://github.com/744789070/flowterm">
+    <img alt="FlowTerm Mascot" src="./assets/mascot.png" width="200" style="border-radius: 24px;">
   </a>
   <br/>
 </p>
 
-# Wave Terminal
+<h1 align="center">FlowTerm</h1>
 
 <div align="center">
 
-[English](README.md) | [한국어](README.ko.md) | [繁體中文](README.zh-TW.md)
+基于 [Wave Terminal](https://github.com/wavetermdev/waveterm) 的二次开发分支 · Apache-2.0 · 简体中文 / [English](https://github.com/wavetermdev/waveterm#readme)
+
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey)](README.md)
+[![Upstream](https://img.shields.io/badge/upstream-Wave%20Terminal-58C142)](https://github.com/wavetermdev/waveterm)
 
 </div>
 
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fwavetermdev%2Fwaveterm.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fwavetermdev%2Fwaveterm?ref=badge_shield)
+---
 
-Wave is an open-source, AI-integrated terminal for macOS, Linux, and Windows. It works with any AI model. Bring your own API keys for OpenAI, Claude, or Gemini, or run local models via Ollama and LM Studio. No accounts required.
+**FlowTerm** 是一个开源的、集成 AI 能力的跨平台终端，基于 [Wave Terminal](https://github.com/wavetermdev/waveterm) 二次开发而来。所有上游许可声明均保留在 [LICENSE](LICENSE) 与 [NOTICE](NOTICE) 中。
 
-Wave also supports durable SSH sessions that survive network interruptions and restarts, with automatic reconnection. Edit remote files with a built-in graphical editor and preview files inline without leaving the terminal.
+FlowTerm 在 Wave 的基础上聚焦中文用户体验与轻量化定制：内置简体中文/English 双语界面、统一的框架内确认交互、更符合中文用户的品牌与默认配置，并移除了与上游云服务绑定的入口。
 
-![WaveTerm Screenshot](./assets/wave-screenshot.webp)
+![FlowTerm 截图](./assets/screenshot-onboarding.png)
 
-## Key Features
+## ✨ 主要特性
 
-- Wave AI - Context-aware terminal assistant that reads your terminal output, analyzes widgets, and performs file operations
-- Durable SSH Sessions - Remote terminal sessions survive connection interruptions, network changes, and Wave restarts with automatic reconnection
-- Flexible drag & drop interface to organize terminal blocks, editors, web browsers, and AI assistants
-- Built-in editor for editing remote files with syntax highlighting and modern editor features
-- Rich file preview system for remote files (markdown, images, video, PDFs, CSVs, directories)
-- Quick full-screen toggle for any block - expand terminals, editors, and previews for better visibility, then instantly return to multi-block view
-- AI chat widget with support for multiple models (OpenAI, Claude, Azure, Perplexity, Ollama)
-- Command Blocks for isolating and monitoring individual commands
-- One-click remote connections with full terminal and file system access
-- Secure secret storage using native system backends - store API keys and credentials locally, access them across SSH sessions
-- Rich customization including tab themes, terminal styles, and background images
-- Powerful `wsh` command system for managing your workspace from the CLI and sharing data between terminal sessions
-- Connected file management with `wsh file` - seamlessly copy and sync files between local and remote SSH hosts
+继承自 Wave Terminal 的全部能力：
 
-## Wave AI
+- **强大的分屏终端** —— 灵活的拖拽布局，自由组织终端、编辑器与预览块
+- **持久化 SSH 会话** —— 断网、重启自动重连，远程会话永不丢失
+- **远程文件管理** —— 内置图形化编辑器与在线预览（Markdown / 图片 / CSV / 目录）
+- **`wsh` 命令系统** —— 在终端与会话之间共享数据、管理工作区
+- **任意 AI 模型** —— BYOK 支持自定义 API Key，兼容 OpenAI / Claude / Gemini / Ollama
 
-Wave AI is your context-aware terminal assistant with access to your workspace:
+FlowTerm 的二次开发增强：
 
-- **Terminal Context**: Reads terminal output and scrollback for debugging and analysis
-- **File Operations**: Read, write, and edit files with automatic backups and user approval
-- **CLI Integration**: Use `wsh ai` to pipe output or attach files directly from the command line
-- **BYOK Support**: Bring your own API keys for OpenAI, Claude, Gemini, Azure, and other providers
-- **Local Models**: Run local models with Ollama, LM Studio, and other OpenAI-compatible providers
-- **Free Beta**: Included AI credits while we refine the experience
-- **Coming Soon**: Command execution (with approval)
+- 🌐 **简体中文 / English 双语界面** —— `app:language` 一键切换，缺失文案自动回落英文
+- 🔔 **统一的框架内确认交互** —— 关闭标签页、删除工作区、关闭窗口均使用与应用风格一致的确认弹窗
+- 🖼️ **个性化工作区图标** —— 支持项目 SVG 图标（默认 `layers-fill`），跟随工作区颜色渲染
+- 🧹 **更纯净的默认配置** —— 精简上游云服务入口，开箱即用
 
-Learn more in our [Wave AI documentation](https://docs.waveterm.dev/waveai) and [Wave AI Modes documentation](https://docs.waveterm.dev/waveai-modes).
+## 📦 安装与构建
 
-## Installation
+```sh
+# 依赖：Node 22 LTS / Go / Task (go-task) / Zig
+task init                 # 安装依赖
+task electron:winquickdev # Windows 开发模式（带热更新）
+task package              # 打包安装程序（产物在 make/）
+```
 
-Wave Terminal works on macOS, Linux, and Windows.
+完整的依赖清单、图标资源替换与二次开发扩展指南见 [DEVELOPMENT.md](DEVELOPMENT.md)。
 
-Platform-specific installation instructions can be found [here](https://docs.waveterm.dev/gettingstarted).
+## 🗺️ Roadmap
 
-You can also install Wave Terminal directly from: [www.waveterm.dev/download](https://www.waveterm.dev/download).
+FlowTerm 处于活跃开发阶段。功能建议与问题反馈欢迎提 Issue。
 
-### Minimum requirements
+## 🙏 致谢
 
-Wave Terminal runs on the following platforms:
+FlowTerm 站在巨人的肩膀上——感谢 [Wave Terminal](https://github.com/wavetermdev/waveterm) 与 [Command Line Inc](https://www.commandline.dev/) 的杰出工作，以及上游的全部[贡献者](https://github.com/wavetermdev/waveterm/graphs/contributors)。
 
-- macOS 11 or later (arm64, x64)
-- Windows 10 1809 or later (x64)
-- Linux based on glibc-2.28 or later (Debian 10, RHEL 8, Ubuntu 20.04, etc.) (arm64, x64)
+上游文档：[docs.waveterm.dev](https://docs.waveterm.dev) · 上游社区：[Discord](https://discord.gg/XfvZ334gwU)
 
-The WSH helper runs on the following platforms:
+## 📄 许可证
 
-- macOS 11 or later (arm64, x64)
-- Windows 10 or later (x64)
-- Linux Kernel 2.6.32 or later (x64), Linux Kernel 3.1 or later (arm64)
-
-## Roadmap
-
-Wave is constantly improving! Our roadmap will be continuously updated with our goals for each release. You can find it [here](./ROADMAP.md).
-
-Want to provide input to our future releases? Connect with us on [Discord](https://discord.gg/XfvZ334gwU) or open a [Feature Request](https://github.com/wavetermdev/waveterm/issues/new/choose)!
-
-## Links
-
-- Homepage &mdash; https://www.waveterm.dev
-- Download Page &mdash; https://www.waveterm.dev/download
-- Documentation &mdash; https://docs.waveterm.dev
-- X &mdash; https://x.com/wavetermdev
-- Discord Community &mdash; https://discord.gg/XfvZ334gwU
-
-## Building from Source
-
-See [Building Wave Terminal](BUILD.md).
-
-## Contributing
-
-Wave uses GitHub Issues for issue tracking.
-
-Find more information in our [Contributions Guide](CONTRIBUTING.md), which includes:
-
-- [Ways to contribute](CONTRIBUTING.md#contributing-to-wave-terminal)
-- [Contribution guidelines](CONTRIBUTING.md#before-you-start)
-
-### Sponsoring Wave ❤️
-
-If Wave Terminal is useful to you or your company, consider sponsoring development.
-
-Sponsorship helps support the time spent building and maintaining the project.
-
-- https://github.com/sponsors/wavetermdev
-
-## License
-
-Wave Terminal is licensed under the Apache-2.0 License. For more information on our dependencies, see [here](./ACKNOWLEDGEMENTS.md).
+[Apache-2.0](LICENSE) © Command Line Inc · FlowTerm 二次开发部分遵循同一协议
