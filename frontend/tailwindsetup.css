@@ -144,3 +144,8 @@ svg [aria-label="tip"] g path {
     -webkit-mask-image: url("./app/asset/layers-fill.svg");
     mask-image: url("./app/asset/layers-fill.svg");
 }
+
+.svgicon-qq {
+    -webkit-mask-image: url("./app/asset/qq.svg");
+    mask-image: url("./app/asset/qq.svg");
+}

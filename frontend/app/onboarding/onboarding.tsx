@@ -125,14 +125,7 @@ const InitPage = ({
                     </div>
                     <div className="flex w-full items-center gap-[18px]">
                         <div>
-                            <a
-                                target="_blank"
-                                href="https://discord.gg/XfvZ334gwU"
-                                rel="noopener"
-                                className="text-accent"
-                            >
-                                <i className="text-[25px] text-white/50 fa-solid fa-people-group"></i>
-                            </a>
+                            <i className="svgicon svgicon-qq text-[26px] text-white/50"></i>
                         </div>
                         <div className="flex flex-col items-start gap-1 flex-1">
                             <div className="text-foreground text-base leading-[18px]">
@@ -142,10 +135,8 @@ const InitPage = ({
                                 {t("onboarding.init.communityText")}
                                 <br />
                                 <a
-                                    target="_blank"
-                                    href="https://discord.gg/XfvZ334gwU"
-                                    rel="noopener"
-                                    className="text-accent"
+                                    className="text-accent cursor-pointer"
+                                    onClick={() => navigator.clipboard.writeText("1132049945")}
                                 >
                                     {t("onboarding.init.communityLink")}
                                 </a>
