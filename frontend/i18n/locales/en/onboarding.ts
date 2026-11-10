@@ -20,7 +20,7 @@ const onboarding = {
         githubOpenModel: "open-model",
         githubText:
             ", and committed to providing a free terminal for individual users. Please show your support by giving us a star on",
-        githubLink: "Github (wavetermdev/waveterm)",
+        githubLink: "Github (bintang1996/flowterm)",
         communityTitle: "Join our Community",
         communityText: "Get help, submit feature requests, report bugs, or just chat with fellow terminal enthusiasts.",
         communityLink: "Join the Wave Discord Channel",

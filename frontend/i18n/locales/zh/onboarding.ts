@@ -22,7 +22,7 @@ const zhOnboarding: DeepPartial<Dict["onboarding"]> = {
         githubSep: "、",
         githubOpenModel: "开放模型",
         githubText: "，致力于为个人用户提供免费的终端。请给我们点一个 Star 以示支持：",
-        githubLink: "Github（wavetermdev/waveterm）",
+        githubLink: "Github（bintang1996/flowterm）",
         communityTitle: "加入我们的社区",
         communityText: "获取帮助、提交功能建议、报告问题，或与志同道合的终端爱好者畅聊交流。",
         communityLink: "加入 Wave Discord 频道",
