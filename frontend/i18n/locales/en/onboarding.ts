@@ -14,13 +14,13 @@ const onboarding = {
     init: {
         welcome: "Welcome to FlowTerm",
         githubTitle: "Support us on GitHub",
-        githubIntro: "We're",
+        githubIntro: "FlowTerm is built on top of the open-source terminal Wave Terminal. We're ",
         githubOpenSource: "open source",
-        githubSep: ",",
+        githubSep: ", ",
         githubOpenModel: "open-model",
         githubText:
-            ", and committed to providing a free terminal for individual users. Please show your support by giving us a star on",
-        githubLink: "Github (bintang1996/flowterm)",
+            ", and committed to providing a free terminal for individual users. Give us a star if you like it — and thanks to the upstream Wave Terminal project: ",
+        githubLink: "GitHub (bintang1996/flowterm)",
         communityTitle: "Join our Community",
         communityText: "Get help, submit feature requests, report bugs, or just chat with fellow terminal enthusiasts.",
         communityLink: "Join the Wave Discord Channel",

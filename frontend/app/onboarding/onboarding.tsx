@@ -108,14 +108,16 @@ const InitPage = ({
                                 {t("onboarding.init.githubTitle")}
                             </div>
                             <div className="text-secondary leading-5">
-                                {t("onboarding.init.githubIntro")} <i>{t("onboarding.init.githubOpenSource")}</i>
-                                {t("onboarding.init.githubSep")} <i>{t("onboarding.init.githubOpenModel")}</i>
-                                {t("onboarding.init.githubText")}{" "}
+                                {t("onboarding.init.githubIntro")}
+                                <i>{t("onboarding.init.githubOpenSource")}</i>
+                                {t("onboarding.init.githubSep")}
+                                <i>{t("onboarding.init.githubOpenModel")}</i>
+                                {t("onboarding.init.githubText")}
                                 <a
                                     target="_blank"
                                     href="https://github.com/bintang1996/flowterm?ref=install"
                                     rel="noopener"
-                                    className="text-accent"
+                                    className="text-accent whitespace-nowrap"
                                     onClick={handleStarClick}
                                 >
                                     {t("onboarding.init.githubLink")}
