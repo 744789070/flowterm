@@ -83,6 +83,7 @@ function makeMockWorkspace(tabIds: string[]): Workspace {
         oid: TabBarMockWorkspaceId,
         version: 1,
         name: "Preview Workspace",
+        icon: "svg@layers-fill",
         tabids: tabIds,
         activetabid: tabIds[1] ?? tabIds[0] ?? "",
         meta: {},

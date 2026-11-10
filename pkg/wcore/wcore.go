@@ -12,6 +12,7 @@ import (
 	"encoding/pem"
 	"fmt"
 	"log"
+	"os"
 	"strings"
 	"time"
 
@@ -72,7 +73,7 @@ func EnsureInitialData() (bool, error) {
 	wsId := ""
 	if firstLaunch {
 		log.Println("client has no windows and first launch, creating starter workspace")
-		starterWs, err := CreateWorkspace(ctx, "Starter workspace", "custom@wave-logo-solid", "#58C142", false, true)
+		starterWs, err := CreateWorkspace(ctx, getStarterWorkspaceName(), "svg@layers-fill", "#58C142", false, true)
 		if err != nil {
 			return firstLaunch, fmt.Errorf("error creating starter workspace: %w", err)
 		}
@@ -83,6 +84,16 @@ func EnsureInitialData() (bool, error) {
 		return firstLaunch, fmt.Errorf("error creating window: %w", err)
 	}
 	return firstLaunch, nil
+}
+
+// getStarterWorkspaceName returns the initial workspace name localized by the
+// OS locale passed from electron (WAVETERM_LOCALE), since no user config exists on first launch.
+func getStarterWorkspaceName() string {
+	locale := strings.ToLower(os.Getenv("WAVETERM_LOCALE"))
+	if strings.HasPrefix(locale, "zh") {
+		return "初始工作区"
+	}
+	return "Starter workspace"
 }
 
 func CreateClient(ctx context.Context) (*waveobj.Client, error) {

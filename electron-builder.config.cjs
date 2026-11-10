@@ -43,6 +43,7 @@ const config = {
     asarUnpack: [
         "dist/bin/**/*", // wavesrv and wsh binaries
         "dist/schema/**/*", // schema files for Monaco editor
+        "dist/frontend/logos/**/*", // window/taskbar icon for Linux BrowserWindow icon
     ],
     mac: {
         target: [

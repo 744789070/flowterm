@@ -7,7 +7,7 @@ import { randomUUID } from "crypto";
 import { BrowserWindow, webContents } from "electron";
 import { globalEvents } from "emain/emain-events";
 import path from "path";
-import { getElectronAppBasePath, isDevVite, unamePlatform } from "./emain-platform";
+import { getElectronAppBasePath, getWaveAppIconPath, isDevVite, unamePlatform } from "./emain-platform";
 import { calculateWindowBounds, MinWindowHeight, MinWindowWidth } from "./emain-window";
 import { ElectronWshClient } from "./emain-wsh";
 
@@ -60,7 +60,7 @@ export async function createBuilderWindow(appId: string): Promise<BuilderWindowT
         titleBarStyle: unamePlatform === "darwin" ? "hiddenInset" : "default",
         icon:
             unamePlatform === "linux"
-                ? path.join(getElectronAppBasePath(), "public/logos/wave-logo-dark.png")
+                ? getWaveAppIconPath()
                 : undefined,
         show: false,
         backgroundColor: "#222222",

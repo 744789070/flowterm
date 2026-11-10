@@ -125,3 +125,22 @@ svg [aria-label="tip"] g path {
         opacity: 0;
     }
 }
+
+/* 项目自带 SVG 图标（makeIconClass 的 svg@ 前缀）：mask + currentColor 渲染，跟随文字颜色 */
+.svgicon {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    background-color: currentColor;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+}
+
+.svgicon-layers-fill {
+    -webkit-mask-image: url("./app/asset/layers-fill.svg");
+    mask-image: url("./app/asset/layers-fill.svg");
+}

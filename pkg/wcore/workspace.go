@@ -33,8 +33,10 @@ var WorkspaceColors = [...]string{
 	"#FFE900", // Yellow
 }
 
+// 图标 id 由前端 makeIconClass 解析。svg@ 前缀走项目自带 SVG（frontend/app/asset/*.svg），
+// 其余前缀走 Font Awesome。第一个是新建/保存工作区时的默认图标。
 var WorkspaceIcons = [...]string{
-	"custom@wave-logo-solid",
+	"svg@layers-fill",
 	"triangle",
 	"star",
 	"heart",

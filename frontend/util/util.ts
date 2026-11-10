@@ -144,6 +144,7 @@ function makeIconClass(icon: string, fw: boolean, opts?: { spin?: boolean; defau
     }
 
     let baseClass: string;
+    let skipFaModifiers = false;
     if (icon.match(/^(solid@)?[a-z0-9-]+$/)) {
         icon = icon.replace(/^solid@/, "");
         baseClass = `fa fa-solid fa-${icon}`;
@@ -156,6 +157,12 @@ function makeIconClass(icon: string, fw: boolean, opts?: { spin?: boolean; defau
     } else if (icon.match(/^custom@[a-z0-9-]+$/)) {
         icon = icon.replace(/^custom@/, "");
         baseClass = `fa fa-kit fa-${icon}`;
+    } else if (icon.match(/^svg@[a-z0-9-]+$/)) {
+        // 项目自带的 SVG 图标（frontend/app/asset/*.svg，样式见 tailwindsetup.css 的 .svgicon-*）：
+        // mask + currentColor 渲染，跟随文字颜色；单色，无 FA 修饰符
+        icon = icon.replace(/^svg@/, "");
+        baseClass = `svgicon svgicon-${icon}`;
+        skipFaModifiers = true;
     } else {
         if (opts?.defaultIcon != null) {
             return makeIconClass(opts.defaultIcon, fw, { spin: opts?.spin });
@@ -163,9 +170,9 @@ function makeIconClass(icon: string, fw: boolean, opts?: { spin?: boolean; defau
         return null;
     }
 
-    const shouldAddFw = fw || hasFwModifier;
+    const shouldAddFw = !skipFaModifiers && (fw || hasFwModifier);
     const hasSpin = animation === "spin" || opts?.spin;
-    const animationClass = animation && animation !== "spin" ? `fa-${animation}` : null;
+    const animationClass = !skipFaModifiers && animation && animation !== "spin" ? `fa-${animation}` : null;
 
     return clsx(baseClass, shouldAddFw ? "fa-fw" : null, hasSpin ? "fa-spin" : null, animationClass);
 }
