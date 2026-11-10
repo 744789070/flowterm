@@ -50,6 +50,8 @@ contextBridge.exposeInMainWorld("api", {
     createWorkspace: () => ipcRenderer.send("create-workspace"),
     switchWorkspace: (workspaceId) => ipcRenderer.send("switch-workspace", workspaceId),
     deleteWorkspace: (workspaceId) => ipcRenderer.send("delete-workspace", workspaceId),
+    onModalConfirmRequest: (callback) => ipcRenderer.on("modal-confirm-request", (_event, data) => callback(data)),
+    resolveModalConfirm: (id, ok) => ipcRenderer.send("modal-confirm-response", id, ok),
     setActiveTab: (tabId) => ipcRenderer.send("set-active-tab", tabId),
     createTab: () => ipcRenderer.send("create-tab"),
     closeTab: (workspaceId, tabId, confirmClose) => ipcRenderer.invoke("close-tab", workspaceId, tabId, confirmClose),
