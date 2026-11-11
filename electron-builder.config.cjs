@@ -129,8 +129,10 @@ const config = {
         fpm: ["--rpm-rpmbuild-define", "_build_id_links none"],
     },
     publish: {
-        provider: "generic",
-        url: "https://dl.waveterm.dev/releases-w2",
+        // FlowTerm 更新源：指向本仓库的 GitHub Releases（latest.yml 随 Release 一起上传）
+        provider: "github",
+        owner: "bintang1996",
+        repo: "flowterm",
     },
     afterPack: (context) => {
         // This is a workaround to restore file permissions to the wavesrv binaries on macOS after packaging the universal binary.

@@ -148,5 +148,9 @@
         "esbuild@0.25.12": true,
         "esbuild@0.28.1": true,
         "sharp@0.34.5": true
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/bintang1996/flowterm.git"
     }
 }
