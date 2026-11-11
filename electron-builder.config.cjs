@@ -96,6 +96,16 @@ const config = {
     deb: {
         afterInstall: "build/deb-postinstall.tpl",
     },
+    nsis: {
+        // 向导式安装：用户可自选安装目录（默认用户目录，选受保护路径时自动请求提权）
+        oneClick: false,
+        perMachine: false,
+        allowToChangeInstallationDirectory: true,
+        allowElevation: true,
+        createDesktopShortcut: "always",
+        createStartMenuShortcut: true,
+        shortcutName: "FlowTerm",
+    },
     win: {
         target: ["nsis", "msi", "zip"],
         signtoolOptions: windowsShouldSign && {
