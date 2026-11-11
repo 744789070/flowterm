@@ -63,7 +63,7 @@ export async function createBuilderWindow(appId: string): Promise<BuilderWindowT
                 ? getWaveAppIconPath()
                 : undefined,
         show: false,
-        backgroundColor: "#161616", // 玄墨画布
+        backgroundColor: "#0d1117", // 玄墨画布
         webPreferences: {
             preload: path.join(getElectronAppBasePath(), "preload", "index.cjs"),
             webviewTag: true,

@@ -212,7 +212,7 @@ export class WaveBrowserWindow extends BaseWindow {
             } else if (isBlur) {
                 winOpts.vibrancy = "fullscreen-ui";
             } else {
-                winOpts.backgroundColor = "#161616"; // 玄墨画布
+                winOpts.backgroundColor = "#0d1117"; // 玄墨画布
             }
         } else if (opts.unamePlatform === "linux") {
             winOpts.titleBarStyle = settings["window:nativetitlebar"] ? "default" : "hidden";
@@ -225,12 +225,12 @@ export class WaveBrowserWindow extends BaseWindow {
             if (isTransparent) {
                 winOpts.transparent = true;
             } else {
-                winOpts.backgroundColor = "#161616"; // 玄墨画布
+                winOpts.backgroundColor = "#0d1117"; // 玄墨画布
             }
         } else if (opts.unamePlatform === "win32") {
             winOpts.titleBarStyle = "hidden";
             winOpts.titleBarOverlay = {
-                color: "#161616", // 玄墨画布
+                color: "#0d1117", // 玄墨画布
                 symbolColor: "#c3c8c2",
                 height: 32,
             };
@@ -239,7 +239,7 @@ export class WaveBrowserWindow extends BaseWindow {
             } else if (isBlur) {
                 winOpts.backgroundMaterial = "acrylic";
             } else {
-                winOpts.backgroundColor = "#161616"; // 玄墨画布
+                winOpts.backgroundColor = "#0d1117"; // 玄墨画布
             }
         }
 

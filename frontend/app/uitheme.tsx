@@ -10,7 +10,7 @@ import { atoms, getSettingsPrefixAtom, useSettingsKeyAtom } from "@/store/global
 import { useAtomValue } from "jotai";
 import { useEffect, useRef } from "react";
 
-const DefaultUiTheme = "mono"; // 经典 Classic：传统命令行深灰底 + 紫色强调
+const DefaultUiTheme = "github"; // Dark Default：GitHub 风格深色 #0d1117 + 蓝 #58a6ff
 
 function UiThemeUpdater() {
     const uiThemeSetting = useSettingsKeyAtom("app:uityheme");
