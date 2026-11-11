@@ -40,6 +40,8 @@ const zhCommon: DeepPartial<Dict["common"]> = {
     yes: "是",
     no: "否",
     language: "语言",
+    uiTheme: "界面主题",
+    themeDefault: "默认",
 };
 
 export { zhCommon };

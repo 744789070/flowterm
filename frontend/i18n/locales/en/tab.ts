@@ -18,6 +18,7 @@ const tab = {
     copyTabId: "Copy TabId",
     flagTab: "Flag Tab",
     backgrounds: "Backgrounds",
+    uiTheme: "Interface Theme",
     closeTab: "Close Tab",
     addTab: "Add Tab",
     newTab: "New Tab",
@@ -28,7 +29,6 @@ const tab = {
     downloading: "Downloading",
     installing: "Installing",
     clickToInstallUpdate: "Click to Install Update",
-    toggleWaveAIPanel: "Toggle Wave AI Panel",
 };
 
 export { tab };

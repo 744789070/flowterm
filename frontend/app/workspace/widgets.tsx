@@ -2,7 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Tooltip } from "@/app/element/tooltip";
+import { atoms } from "@/app/store/global";
+import { RpcApi } from "@/app/store/wshclientapi";
 import { TabRpcClient } from "@/app/store/wshrpcutil";
+import { DefaultUiTheme } from "@/app/uitheme";
 import { useWaveEnv, WaveEnv, WaveEnvSubset } from "@/app/waveenv/waveenv";
 import { shouldIncludeWidgetForWorkspace } from "@/app/workspace/widgetfilter";
 import { useT, type TranslationKey } from "@/i18n/i18n";
@@ -19,7 +22,7 @@ import {
 } from "@floating-ui/react";
 import clsx from "clsx";
 import { useAtomValue } from "jotai";
-import { memo, useCallback, useEffect, useRef, useState } from "react";
+import { Fragment, memo, useCallback, useEffect, useRef, useState } from "react";
 
 export type WidgetsEnv = WaveEnvSubset<{
     isDev: WaveEnv["isDev"];
@@ -294,6 +297,21 @@ const SettingsFloatingWindow = memo(
         const dismiss = useDismiss(context);
         const { getFloatingProps } = useInteractions([dismiss]);
 
+        // 界面主题选择（uityhemes.json，settings 键 app:uityheme）
+        const uiThemeSetting = useAtomValue(atoms.settingsAtom)?.["app:uityheme"] ?? DefaultUiTheme;
+        const fullConfig = useAtomValue(env.atoms.fullConfigAtom);
+        const [uiThemePickerOpen, setUiThemePickerOpen] = useState(false);
+        const uiThemes = fullConfig?.uityhemes ?? {};
+        const uiThemeKeys = Object.keys(uiThemes)
+            .filter((k) => uiThemes[k] != null)
+            .sort((a, b) => (uiThemes[a]["display:order"] ?? 0) - (uiThemes[b]["display:order"] ?? 0));
+
+        useEffect(() => {
+            if (!isOpen) {
+                setUiThemePickerOpen(false);
+            }
+        }, [isOpen]);
+
         if (!isOpen) return null;
 
         const menuItems = [
@@ -310,6 +328,11 @@ const SettingsFloatingWindow = memo(
                     env.createBlock(blockDef, false, true);
                     onClose();
                 },
+            },
+            {
+                icon: "palette",
+                label: t("common.uiTheme"),
+                onClick: () => setUiThemePickerOpen((v) => !v),
             },
             {
                 icon: "lightbulb",
@@ -370,19 +393,43 @@ const SettingsFloatingWindow = memo(
                     className="bg-modalbg border border-border rounded-lg shadow-xl p-2 z-50"
                 >
                     {menuItems.map((item, idx) => (
-                        <div
-                            key={idx}
-                            className="flex items-center gap-3 px-3 py-2 rounded hover:bg-hoverbg cursor-pointer transition-colors text-secondary hover:text-white"
-                            onClick={item.onClick}
-                        >
-                            <div className="text-lg w-5 flex justify-center">
-                                <i className={makeIconClass(item.icon, false)}></i>
+                        <Fragment key={idx}>
+                            <div
+                                className="flex items-center gap-3 px-3 py-2 rounded hover:bg-hoverbg cursor-pointer transition-colors text-secondary hover:text-white"
+                                onClick={item.onClick}
+                            >
+                                <div className="text-lg w-5 flex justify-center">
+                                    <i className={makeIconClass(item.icon, false)}></i>
+                                </div>
+                                <div className="text-sm whitespace-nowrap">{item.label}</div>
+                                {item.hasError && (
+                                    <i className="fa fa-solid fa-circle-exclamation text-error text-[14px] ml-auto"></i>
+                                )}
                             </div>
-                            <div className="text-sm whitespace-nowrap">{item.label}</div>
-                            {item.hasError && (
-                                <i className="fa fa-solid fa-circle-exclamation text-error text-[14px] ml-auto"></i>
+                            {item.icon === "palette" && uiThemePickerOpen && (
+                                <div className="ml-9 mr-2 flex flex-col pb-1">
+                                    {uiThemeKeys.map((themeKey) => (
+                                        <div
+                                            key={themeKey}
+                                            className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-hoverbg cursor-pointer transition-colors text-secondary hover:text-white text-[13px]"
+                                            onClick={() => {
+                                                fireAndForget(() =>
+                                                    RpcApi.SetConfigCommand(TabRpcClient, { "app:uityheme": themeKey })
+                                                );
+                                                onClose();
+                                            }}
+                                        >
+                                            <span className="w-3 text-center">
+                                                {uiThemeSetting === themeKey && (
+                                                    <i className="fa fa-solid fa-check text-[10px]"></i>
+                                                )}
+                                            </span>
+                                            <span>{uiThemes[themeKey]?.["display:name"] ?? themeKey}</span>
+                                        </div>
+                                    ))}
+                                </div>
                             )}
-                        </div>
+                        </Fragment>
                     ))}
                 </div>
             </FloatingPortal>

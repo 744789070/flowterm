@@ -348,7 +348,8 @@ class SysinfoViewModel implements ViewModel {
     }
 }
 
-const _plotColors = ["#58C142", "#FFC107", "#FF5722", "#2196F3", "#9C27B0", "#00BCD4", "#FFEB3B", "#795548"];
+// 曲线配色：首色为玄墨强调色羽扇豆蓝（与 --sysinfo-cpu-color 一致），其余为区分度色板
+const _plotColors = ["#619ac3", "#FFC107", "#FF5722", "#9C27B0", "#2bae85", "#57c3c2", "#FFEB3B", "#795548"];
 
 type SysinfoViewProps = {
     blockId: string;

@@ -37,6 +37,8 @@ const common = {
     yes: "Yes",
     no: "No",
     language: "Language",
+    uiTheme: "Interface Theme",
+    themeDefault: "Default",
 };
 
 export { common };

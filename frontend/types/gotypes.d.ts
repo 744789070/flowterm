@@ -1016,6 +1016,7 @@ declare global {
         presets: {[key: string]: MetaType};
         backgrounds: {[key: string]: BackgroundConfigType};
         termthemes: {[key: string]: TermThemeType};
+        uityhemes: {[key: string]: UiThemeType};
         connections: {[key: string]: ConnKeywords};
         bookmarks: {[key: string]: WebBookmark};
         waveai: {[key: string]: AIModeConfigType};
@@ -1388,6 +1389,7 @@ declare global {
         "app:focusfollowscursor"?: string;
         "app:tabbar"?: string;
         "app:language"?: string;
+        "app:uityheme"?: string;
         "feature:waveappbuilder"?: boolean;
         "ai:*"?: boolean;
         "ai:preset"?: string;
@@ -1766,6 +1768,13 @@ declare global {
         id?: string;
         data?: any;
         providerMetadata?: {[key: string]: any};
+    };
+
+    // wconfig.UiThemeType
+    type UiThemeType = {
+        "display:name": string;
+        "display:order": number;
+        colors: {[key: string]: string};
     };
 
     // userinput.UserInputRequest

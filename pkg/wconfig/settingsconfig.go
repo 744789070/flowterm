@@ -70,6 +70,7 @@ type SettingsType struct {
 	AppFocusFollowsCursor         string `json:"app:focusfollowscursor,omitempty" jsonschema:"enum=off,enum=on,enum=term"`
 	AppTabBar                     string `json:"app:tabbar,omitempty" jsonschema:"enum=top,enum=left"`
 	AppLanguage                   string `json:"app:language,omitempty" jsonschema:"enum=en,enum=zh"`
+	AppUiTheme                    string `json:"app:uityheme,omitempty" jsonschema:"enum=xuanmo,enum=xuanmo-dimmed,enum=canghai,enum=mono,enum=wave,enum=github"`
 
 	FeatureWaveAppBuilder bool `json:"feature:waveappbuilder,omitempty"`
 
@@ -366,6 +367,15 @@ type TermThemeType struct {
 	Cursor              string  `json:"cursor"`
 }
 
+// UiThemeType is a UI (app chrome) color theme, separate from terminal themes.
+// Colors maps CSS variable names (theme.scss vars and tailwind --color-*/--ansi-* tokens) to values;
+// the frontend applies them on document.body at runtime. Terminal colors (--term-*) are NOT part of UI themes.
+type UiThemeType struct {
+	DisplayName  string            `json:"display:name"`
+	DisplayOrder float64           `json:"display:order"`
+	Colors       map[string]string `json:"colors"`
+}
+
 type FullConfigType struct {
 	Settings       SettingsType                    `json:"settings" merge:"meta"`
 	MimeTypes      map[string]MimeTypeConfigType   `json:"mimetypes"`
@@ -374,6 +384,7 @@ type FullConfigType struct {
 	Presets        map[string]waveobj.MetaMapType  `json:"presets"`
 	Backgrounds    map[string]BackgroundConfigType `json:"backgrounds"`
 	TermThemes     map[string]TermThemeType        `json:"termthemes"`
+	UiThemes       map[string]UiThemeType          `json:"uityhemes"`
 	Connections    map[string]ConnKeywords         `json:"connections"`
 	Bookmarks      map[string]WebBookmark          `json:"bookmarks"`
 	WaveAIModes    map[string]AIModeConfigType     `json:"waveai"`
@@ -697,7 +708,9 @@ func ReadFullConfig() FullConfigType {
 		fullConfig.ConfigErrors = append(fullConfig.ConfigErrors, errs...)
 		if configPart != nil {
 			fieldPtr := configRVal.Field(fieldIdx).Addr().Interface()
-			utilfn.ReUnmarshal(fieldPtr, configPart)
+			if err := utilfn.ReUnmarshal(fieldPtr, configPart); err != nil {
+				fullConfig.ConfigErrors = append(fullConfig.ConfigErrors, ConfigError{File: jsonTag + ".json", Err: fmt.Sprintf("error unmarshaling config part: %v", err)})
+			}
 		}
 	}
 	fullConfig.Version = wavebase.WaveVersion

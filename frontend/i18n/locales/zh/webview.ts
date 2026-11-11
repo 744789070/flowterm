@@ -42,14 +42,6 @@ const zhWebview: DeepPartial<Dict["webview"]> = {
     vdom: {
         invalidTag: "无效标签 <{tag}>",
     },
-    aiFileDiff: {
-        loading: "正在加载差异...",
-        noDiffData: "无可用差异数据",
-        missingChatMetadata: "区块元数据中缺少 chatId 或 toolCallId",
-        missingFileName: "区块元数据中缺少文件名",
-        noDiffFromServer: "服务器未返回差异数据",
-        errorLoading: "加载差异数据时出错：{msg}",
-    },
 };
 
 export { zhWebview };

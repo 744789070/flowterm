@@ -22,11 +22,22 @@ const modals = {
         remote: "Remote",
         reconnectTo: "Reconnect to {conn}",
         disconnect: "Disconnect {conn}",
-        editConnections: "Edit Connections",
+        addConnection: "Add Connection",
         newConnection: "{conn} (New Connection)",
     },
     modal: {
         closeEsc: "Close (ESC)",
+    },
+    addConn: {
+        title: "Add Connection",
+        description: "Enter SSH details; the connection will appear in the connection list.",
+        name: "Connection name",
+        host: "Host (SSH)",
+        user: "User (optional)",
+        port: "Port (optional, default 22)",
+        submit: "Add",
+        saveFailed: "Failed to save, please try again",
+        overwriteConfirm: "Connection \"{name}\" already exists. Overwrite its settings?",
     },
 };
 

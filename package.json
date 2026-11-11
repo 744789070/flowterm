@@ -7,7 +7,7 @@
     "productName": "FlowTerm",
     "description": "FlowTerm - Open-Source AI-Native Terminal Built for Seamless Workflows (based on Wave Terminal)",
     "license": "Apache-2.0",
-    "version": "0.14.5",
+    "version": "0.1.0",
     "homepage": "https://waveterm.dev",
     "build": {
         "appId": "dev.flowterm.app"

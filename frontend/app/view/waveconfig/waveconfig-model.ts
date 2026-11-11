@@ -33,29 +33,6 @@ export type ConfigFile = {
 
 export const SecretNameRegex = /^[A-Za-z][A-Za-z0-9_]*$/;
 
-function validateAiJson(parsed: any): ValidationResult {
-    const keys = Object.keys(parsed);
-    for (const key of keys) {
-        if (!key.startsWith("ai@")) {
-            return { error: t("waveconfig.invalidAiKey", { key }) };
-        }
-    }
-    return { success: true };
-}
-
-function validateWaveAiJson(parsed: any): ValidationResult {
-    const keys = Object.keys(parsed);
-    const keyPattern = /^[a-zA-Z0-9_@.-]+$/;
-    for (const key of keys) {
-        if (!keyPattern.test(key)) {
-            return {
-                error: t("waveconfig.invalidWaveAiKey", { key }),
-            };
-        }
-    }
-    return { success: true };
-}
-
 function makeConfigFiles(isWindows: boolean): ConfigFile[] {
     return [
         {
@@ -81,16 +58,6 @@ function makeConfigFiles(isWindows: boolean): ConfigFile[] {
             hasJsonView: true,
         },
         {
-            name: t("waveconfig.file.waveAiModes"),
-            path: "waveai.json",
-            language: "json",
-            description: t("waveconfig.file.waveAiModesDesc"),
-            docsUrl: "https://docs.waveterm.dev/waveai-modes",
-            validator: validateWaveAiJson,
-            hasJsonView: true,
-            // visualComponent: WaveAIVisualContent,
-        },
-        {
             name: t("waveconfig.file.tabBackgrounds"),
             path: "backgrounds.json",
             language: "json",
@@ -114,15 +81,6 @@ function makeDeprecatedConfigFiles(): ConfigFile[] {
             path: "presets.json",
             language: "json",
             deprecated: true,
-            hasJsonView: true,
-        },
-        {
-            name: t("waveconfig.file.aiPresets"),
-            path: "presets/ai.json",
-            language: "json",
-            deprecated: true,
-            docsUrl: "https://docs.waveterm.dev/ai-presets",
-            validator: validateAiJson,
             hasJsonView: true,
         },
     ];

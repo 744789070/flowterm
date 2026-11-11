@@ -1,9 +1,10 @@
 // Copyright 2026, Command Line Inc.
 // SPDX-License-Identifier: Apache-2.0
 
+import { zhAipanel } from "./aipanel";
+import { zhWaveai } from "./waveai";
 import type { Dict } from "../en";
 import type { DeepPartial } from "@/i18n/types";
-import { zhAipanel } from "./aipanel";
 import { zhBlockframe } from "./blockframe";
 import { zhConn } from "./conn";
 import { zhCommon } from "./common";
@@ -21,7 +22,6 @@ import { zhTab } from "./tab";
 import { zhTerm } from "./term";
 import { zhTips } from "./tips";
 import { zhViews } from "./views";
-import { zhWaveai } from "./waveai";
 import { zhWaveconfig } from "./waveconfig";
 import { zhWeb } from "./web";
 import { zhWebview } from "./webview";
@@ -40,8 +40,6 @@ const zh: DeepPartial<Dict> = {
     preview: zhPreview,
     web: zhWeb,
     webview: zhWebview,
-    waveai: zhWaveai,
-    aipanel: zhAipanel,
     launcher: zhLauncher,
     sysinfo: zhSysinfo,
     processviewer: zhProcessviewer,
@@ -51,6 +49,8 @@ const zh: DeepPartial<Dict> = {
     help: zhHelp,
     tips: zhTips,
     main: zhMain,
+    aipanel: zhAipanel,
+    waveai: zhWaveai,
 };
 
 export { zh as ZH_DICT };

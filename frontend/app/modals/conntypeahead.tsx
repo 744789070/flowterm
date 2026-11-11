@@ -6,7 +6,6 @@ import { TypeAheadModal } from "@/app/modals/typeaheadmodal";
 import { ConnectionsModel } from "@/app/store/connections-model";
 import {
     atoms,
-    createBlock,
     getConnStatusAtom,
     getLocalHostDisplayNameAtom,
     globalStore,
@@ -16,6 +15,7 @@ import { globalRefocusWithTimeout } from "@/app/store/keymodel";
 import { RpcApi } from "@/app/store/wshclientapi";
 import { TabRpcClient } from "@/app/store/wshrpcutil";
 import { t, useT } from "@/i18n/i18n";
+import { modalsModel } from "@/store/modalmodel";
 import { NodeModel } from "@/layout/index";
 import * as keyutil from "@/util/keyutil";
 import * as util from "@/util/util";
@@ -228,33 +228,24 @@ function getDisconnectItem(
     return disconnectSuggestionItem;
 }
 
-function getConnectionsEditItem(
-    changeConnModalAtom: jotai.PrimitiveAtom<boolean>,
+function getAddConnectionItem(
+    openAddConnModal: () => void,
     connSelected: string
 ): SuggestionConnectionItem | null {
     if (connSelected != "") {
         return null;
     }
-    const connectionsEditItem: SuggestionConnectionItem = {
+    const addConnectionItem: SuggestionConnectionItem = {
         status: "disconnected",
-        icon: "gear",
+        icon: "plus",
         iconColor: "var(--grey-text-color)",
-        value: "Edit Connections",
-        label: t("modals.connTypeAhead.editConnections"),
+        value: "Add Connection",
+        label: t("modals.connTypeAhead.addConnection"),
         onSelect: () => {
-            util.fireAndForget(async () => {
-                globalStore.set(changeConnModalAtom, false);
-                const blockDef: BlockDef = {
-                    meta: {
-                        view: "waveconfig",
-                        file: "connections.json",
-                    },
-                };
-                await createBlock(blockDef, false, true);
-            });
+            openAddConnModal();
         },
     };
-    return connectionsEditItem;
+    return addConnectionItem;
 }
 
 function getNewConnectionSuggestionItem(
@@ -338,7 +329,6 @@ const ChangeConnectionBlockModal = React.memo(
             const p2rtn = RpcApi.WslListCommand(TabRpcClient, { timeout: 2000 });
             p2rtn
                 .then((newWslList) => {
-                    console.log(newWslList);
                     setWslList(newWslList ?? []);
                 })
                 .catch((e) => {
@@ -396,7 +386,16 @@ const ChangeConnectionBlockModal = React.memo(
             fullConfig,
             filterOutNowsh
         );
-        const connectionsEditItem = getConnectionsEditItem(changeConnModalAtom, connSelected);
+        // 「添加链接」在应用根层弹出（避免与连接下拉同处 block 树导致焦点被终端抢走）
+        const addConnectionItem = getAddConnectionItem(() => {
+            globalStore.set(changeConnModalAtom, false);
+            modalsModel.pushModal("AddConnectionModal", {
+                onClose: () => {
+                    modalsModel.popModal();
+                    globalRefocusWithTimeout(10);
+                },
+            });
+        }, connSelected);
         const disconnectItem = getDisconnectItem(connection, connStatusMap, changeConnModalAtom);
         const newConnectionSuggestionItem = getNewConnectionSuggestionItem(
             connSelected,
@@ -412,7 +411,7 @@ const ChangeConnectionBlockModal = React.memo(
             ...(localSuggestions ? [localSuggestions] : []),
             ...(remoteSuggestions ? [remoteSuggestions] : []),
             ...(disconnectItem ? [disconnectItem] : []),
-            ...(connectionsEditItem ? [connectionsEditItem] : []),
+            ...(addConnectionItem ? [addConnectionItem] : []),
             ...(newConnectionSuggestionItem ? [newConnectionSuggestionItem] : []),
         ];
 

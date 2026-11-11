@@ -93,3 +93,22 @@ export function formatRemoteUri(path: string, connection: string): string {
     connection = connection ?? "local";
     return `wsh://${connection}/${path}`;
 }
+
+// 旧版工作区默认色板（pkg/wcore/workspace.go 旧 WorkspaceColors，绿 #58C142 打头）。
+// 这些颜色已持久化进 DB，显示时映射为玄墨系新色板对应色；自定义色原样放行，不改 DB。
+const LegacyWorkspaceColorMap: Record<string, string> = {
+    "#58c142": "#2bae85", // 绿 → 铜绿
+    "#00ffdb": "#57c3c2", // 亮青 → 石绿
+    "#429dff": "#619ac3", // 蓝 → 羽扇豆蓝
+    "#bf55ec": "#c08eaf", // 紫 → 萝兰紫
+    "#ff453a": "#e1505d", // 红 → 海棠红 · 降彩
+    "#ff9500": "#f28e16", // 橙 → 杏黄
+    "#ffe900": "#e2c027", // 黄 → 姜黄
+};
+
+export function mapLegacyWorkspaceColor(color: string): string {
+    if (isBlank(color)) {
+        return color;
+    }
+    return LegacyWorkspaceColorMap[color.toLowerCase()] ?? color;
+}

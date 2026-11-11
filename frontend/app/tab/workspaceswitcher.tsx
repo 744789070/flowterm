@@ -14,6 +14,7 @@ import {
 import { Popover, PopoverButton, PopoverContent } from "@/element/popover";
 import { useT } from "@/i18n/i18n";
 import { fireAndForget, makeIconClass, useAtomValueSafe } from "@/util/util";
+import { mapLegacyWorkspaceColor } from "@/util/waveutil";
 import clsx from "clsx";
 import { atom, PrimitiveAtom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { splitAtom } from "jotai/utils";
@@ -108,7 +109,10 @@ const WorkspaceSwitcher = forwardRef<HTMLDivElement>((_, ref) => {
     const isActiveWorkspaceSaved = !!(activeWorkspace.name && activeWorkspace.icon);
 
     const workspaceIcon = isActiveWorkspaceSaved ? (
-        <i className={makeIconClass(activeWorkspace.icon, false)} style={{ color: activeWorkspace.color }}></i>
+        <i
+            className={makeIconClass(activeWorkspace.icon, false)}
+            style={{ color: mapLegacyWorkspaceColor(activeWorkspace.color) }}
+        ></i>
     ) : (
         <WorkspaceSVG />
     );
@@ -244,14 +248,14 @@ const WorkspaceSwitcherItem = ({
                     className="menu-group-title-wrapper"
                     style={
                         {
-                            "--workspace-color": workspace.color,
+                            "--workspace-color": mapLegacyWorkspaceColor(workspace.color),
                         } as CSSProperties
                     }
                 >
                     <ExpandableMenuItemLeftElement>
                         <i
                             className={clsx("left-icon", makeIconClass(workspace.icon, true))}
-                            style={{ color: workspace.color }}
+                            style={{ color: mapLegacyWorkspaceColor(workspace.color) }}
                         />
                     </ExpandableMenuItemLeftElement>
                     <div className="label">{workspace.name}</div>

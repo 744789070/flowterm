@@ -56,6 +56,7 @@ const InputRightElement = memo(({ children, className }: InputRightElementProps)
 });
 
 interface InputProps {
+    id?: string;
     value?: string;
     className?: string;
     onChange?: (value: string) => void;
@@ -78,6 +79,7 @@ const Input = memo(
     forwardRef<HTMLInputElement, InputProps>(
         (
             {
+                id,
                 value,
                 className,
                 onChange,
@@ -132,6 +134,7 @@ const Input = memo(
 
             return (
                 <input
+                    id={id}
                     className={clsx("input", className, {
                         disabled: disabled,
                     })}

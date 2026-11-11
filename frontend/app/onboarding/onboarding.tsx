@@ -29,6 +29,10 @@ type PageName = "init" | "notelemetrystar" | "features";
 
 const pageNameAtom: PrimitiveAtom<PageName> = atom<PageName>("init");
 
+// 暂时禁用引导页的遥测提示（后续有需求再恢复：置回 true，
+// 同时把 pkg/wconfig/defaultconfig/settings.json 的 "telemetry:enabled" 默认值改回 true）
+const SHOW_TELEMETRY_PROMPT = false;
+
 const InitPage = ({
     isCompact,
     telemetryUpdateFn,
@@ -37,7 +41,6 @@ const InitPage = ({
     telemetryUpdateFn: (value: boolean) => Promise<void>;
 }) => {
     const telemetrySetting = useSettingsKeyAtom("telemetry:enabled");
-    const clientData = useAtomValue(ClientModel.getInstance().clientAtom);
     const [telemetryEnabled, setTelemetryEnabled] = useState<boolean>(!!telemetrySetting);
     const setPageName = useSetAtom(pageNameAtom);
     const t = useT();
@@ -59,11 +62,12 @@ const InitPage = ({
     };
 
     const acceptTos = () => {
-        if (!clientData?.tosagreed) {
-            fireAndForget(() => services.ClientService.AgreeTos());
-        }
+        // tosagreed 不在这里记录：引导必须走完最后一页才记录（见 OnboardingFeatures.handleFinish），
+        // 中途关闭/跳过的用户下次启动会重新看到引导
         // FlowTerm 已移除 Wave AI 面板：引导页不再自动打开它
-        setPageName(telemetryEnabled ? "features" : "notelemetrystar");
+        // 遥测提示暂时禁用，直接进入 features 页（恢复提示后改回：
+        // setPageName(telemetryEnabled ? "features" : "notelemetrystar")）
+        setPageName(SHOW_TELEMETRY_PROMPT ? (telemetryEnabled ? "features" : "notelemetrystar") : "features");
     };
 
     const setTelemetry = (value: boolean) => {
@@ -125,7 +129,7 @@ const InitPage = ({
                     </div>
                     <div className="flex w-full items-center gap-[18px]">
                         <div>
-                            <i className="svgicon svgicon-qq text-[26px] text-white/50"></i>
+                            <i className="svgicon svgicon-qq text-[32px] text-white/50"></i>
                         </div>
                         <div className="flex flex-col items-start gap-1 flex-1">
                             <div className="text-foreground text-base leading-[18px]">
@@ -143,34 +147,36 @@ const InitPage = ({
                             </div>
                         </div>
                     </div>
-                    <div className="flex w-full items-center gap-[18px]">
-                        <div>
-                            <i className="text-[32px] text-white/50 fa-solid fa-chart-line"></i>
-                        </div>
-                        <div className="flex flex-col items-start gap-1 flex-1">
-                            <div className="text-secondary leading-5">
-                                {t("onboarding.init.telemetryText")}
-                                <br />
-                                <a
-                                    className="text-secondary! hover:underline!"
-                                    target="_blank"
-                                    href="https://waveterm.dev/privacy"
-                                    rel="noopener"
-                                >
-                                    {t("onboarding.init.privacyPolicy")}
-                                </a>
+                    {SHOW_TELEMETRY_PROMPT && (
+                        <div className="flex w-full items-center gap-[18px]">
+                            <div>
+                                <i className="text-[32px] text-white/50 fa-solid fa-chart-line"></i>
                             </div>
-                            <label className="flex items-center gap-2 cursor-pointer text-secondary">
-                                <input
-                                    type="checkbox"
-                                    checked={telemetryEnabled}
-                                    onChange={(e) => setTelemetry(e.target.checked)}
-                                    className="cursor-pointer accent-gray-500"
-                                />
-                                <span>{label}</span>
-                            </label>
+                            <div className="flex flex-col items-start gap-1 flex-1">
+                                <div className="text-secondary leading-5">
+                                    {t("onboarding.init.telemetryText")}
+                                    <br />
+                                    <a
+                                        className="text-secondary! hover:underline!"
+                                        target="_blank"
+                                        href="https://waveterm.dev/privacy"
+                                        rel="noopener"
+                                    >
+                                        {t("onboarding.init.privacyPolicy")}
+                                    </a>
+                                </div>
+                                <label className="flex items-center gap-2 cursor-pointer text-secondary">
+                                    <input
+                                        type="checkbox"
+                                        checked={telemetryEnabled}
+                                        onChange={(e) => setTelemetry(e.target.checked)}
+                                        className="cursor-pointer accent-gray-500"
+                                    />
+                                    <span>{label}</span>
+                                </label>
+                            </div>
                         </div>
-                    </div>
+                    )}
                 </div>
             </OverlayScrollbarsComponent>
             <footer className={`unselectable flex-shrink-0 ${isCompact ? "mt-2" : "mt-5"}`}>

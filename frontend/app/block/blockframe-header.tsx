@@ -19,8 +19,12 @@ import {
     WOS,
 } from "@/app/store/global";
 import { globalStore } from "@/app/store/jotaiStore";
+import { atoms } from "@/app/store/global";
 import { uxCloseBlock } from "@/app/store/keymodel";
 import { TabRpcClient } from "@/app/store/wshrpcutil";
+import { RpcApi } from "@/app/store/wshclientapi";
+import { DefaultUiTheme } from "@/app/uitheme";
+import { buildUiThemeSubmenu } from "@/app/tab/tabcontextmenu";
 import { useWaveEnv } from "@/app/waveenv/waveenv";
 import { t, useT } from "@/i18n/i18n";
 import { IconButton } from "@/element/iconbutton";
@@ -59,6 +63,12 @@ function handleHeaderContextMenu(
     ];
     const extraItems = viewModel?.getSettingsMenuItems?.();
     if (extraItems && extraItems.length > 0) menu.push({ type: "separator" }, ...extraItems);
+    // 界面主题（UI 主题，与终端「主题」子菜单分开）：所有 block 的设置菜单通用入口
+    const uiThemeItems = buildUiThemeSubmenu(
+        RpcApi,
+        globalStore.get(atoms.settingsAtom)?.["app:uityheme"] ?? DefaultUiTheme
+    );
+    if (uiThemeItems.length > 0) menu.push({ type: "separator" }, ...uiThemeItems);
     menu.push(
         { type: "separator" },
         {

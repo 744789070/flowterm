@@ -1,22 +1,40 @@
 // Copyright 2026, Command Line Inc.
 // SPDX-License-Identifier: Apache-2.0
 
-import { getOrefMetaKeyAtom, globalStore, recordTEvent } from "@/app/store/global";
+import { atoms, getOrefMetaKeyAtom, globalStore, recordTEvent } from "@/app/store/global";
 import { TabRpcClient } from "@/app/store/wshrpcutil";
+import { DefaultUiTheme } from "@/app/uitheme";
 import { t, type TranslationKey } from "@/i18n/i18n";
 import { fireAndForget } from "@/util/util";
 import { makeORef } from "../store/wos";
+import type { RpcApiType } from "@/app/store/wshclientapi";
 import type { TabEnv } from "./tab";
 
+// 与工作区色板一致：墨观 Inkstone 玄墨系（旧默认色存量显示由 mapLegacyWorkspaceColor 映射）
 const FlagColors: { labelKey: TranslationKey; value: string }[] = [
-    { labelKey: "tab.flagColors.green", value: "#58C142" },
-    { labelKey: "tab.flagColors.teal", value: "#00FFDB" },
-    { labelKey: "tab.flagColors.blue", value: "#429DFF" },
-    { labelKey: "tab.flagColors.purple", value: "#BF55EC" },
-    { labelKey: "tab.flagColors.red", value: "#FF453A" },
-    { labelKey: "tab.flagColors.orange", value: "#FF9500" },
-    { labelKey: "tab.flagColors.yellow", value: "#FFE900" },
+    { labelKey: "tab.flagColors.green", value: "#2bae85" }, // 铜绿
+    { labelKey: "tab.flagColors.teal", value: "#57c3c2" }, // 石绿
+    { labelKey: "tab.flagColors.blue", value: "#619ac3" }, // 羽扇豆蓝
+    { labelKey: "tab.flagColors.purple", value: "#c08eaf" }, // 萝兰紫
+    { labelKey: "tab.flagColors.red", value: "#e1505d" }, // 海棠红 · 降彩
+    { labelKey: "tab.flagColors.orange", value: "#f28e16" }, // 杏黄
+    { labelKey: "tab.flagColors.yellow", value: "#e2c027" }, // 姜黄
 ];
+
+// 「界面主题」checkbox 子菜单（UI 主题，uityhemes.json，settings 键 app:uityheme）。
+// tab 右键菜单与 block 头部 ⚙ 设置菜单共用；currentTheme 传已解析的值（null → DefaultUiTheme）。
+export function buildUiThemeSubmenu(rpc: Pick<RpcApiType, "SetConfigCommand">, currentTheme: string): ContextMenuItem[] {
+    const fullConfig = globalStore.get(atoms.fullConfigAtom);
+    const uiThemes = fullConfig?.uityhemes ?? {};
+    const uiThemeKeys = Object.keys(uiThemes).filter((k) => uiThemes[k] != null);
+    uiThemeKeys.sort((a, b) => (uiThemes[a]["display:order"] ?? 0) - (uiThemes[b]["display:order"] ?? 0));
+    return uiThemeKeys.map((themeKey) => ({
+        label: uiThemes[themeKey]["display:name"] ?? themeKey,
+        type: "checkbox" as const,
+        checked: currentTheme === themeKey,
+        click: () => fireAndForget(() => rpc.SetConfigCommand(TabRpcClient, { "app:uityheme": themeKey })),
+    }));
+}
 
 export function buildTabBarContextMenu(env: TabEnv): ContextMenuItem[] {
     const currentTabBar = globalStore.get(env.getSettingsKeyAtom("app:tabbar")) ?? "top";
@@ -114,6 +132,12 @@ export function buildTabContextMenu(
             });
         }
         menu.push({ label: t("tab.backgrounds"), type: "submenu", submenu }, { type: "separator" });
+    }
+    // 界面主题（与终端主题分开，定义在 uityhemes.json，settings 键 app:uityheme）
+    const currentUiTheme = globalStore.get(env.getSettingsKeyAtom("app:uityheme")) ?? DefaultUiTheme;
+    const uiThemeSubmenu = buildUiThemeSubmenu(env.rpc, currentUiTheme);
+    if (uiThemeSubmenu.length > 0) {
+        menu.push({ label: t("tab.uiTheme"), type: "submenu", submenu: uiThemeSubmenu });
     }
     menu.push(...buildTabBarContextMenu(env), { type: "separator" });
     menu.push({ label: t("tab.closeTab"), click: () => onClose(null) });

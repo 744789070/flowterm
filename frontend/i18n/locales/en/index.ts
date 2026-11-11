@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { aipanel } from "./aipanel";
+import { waveai } from "./waveai";
 import { blockframe } from "./blockframe";
 import { conn } from "./conn";
 import { common } from "./common";
@@ -19,7 +20,6 @@ import { tab } from "./tab";
 import { term } from "./term";
 import { tips } from "./tips";
 import { views } from "./views";
-import { waveai } from "./waveai";
 import { waveconfig } from "./waveconfig";
 import { web } from "./web";
 import { webview } from "./webview";
@@ -38,8 +38,6 @@ const en = {
     preview,
     web,
     webview,
-    waveai,
-    aipanel,
     launcher,
     sysinfo,
     processviewer,
@@ -49,6 +47,8 @@ const en = {
     help,
     tips,
     main,
+    aipanel,
+    waveai,
 };
 
 type DictShape = typeof en;

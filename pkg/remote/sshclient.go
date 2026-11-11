@@ -351,8 +351,8 @@ func createPublicKeyCallback(connCtx context.Context, sshKeywords *wconfig.ConnK
 
 		request := &userinput.UserInputRequest{
 			ResponseType: "text",
-			QueryText:    fmt.Sprintf("Enter passphrase for the SSH key: %s", identityFile),
-			Title:        "Publickey Auth + Passphrase",
+			QueryText:    fmt.Sprintf("SSH 密钥需要输入口令（passphrase）：\n%s", identityFile),
+			Title:        "SSH 密钥口令",
 		}
 		ctx, cancelFn := context.WithTimeout(connCtx, 60*time.Second)
 		defer cancelFn()
@@ -400,14 +400,14 @@ func createPasswordCallbackPrompt(connCtx context.Context, remoteDisplayName str
 		ctx, cancelFn := context.WithTimeout(connCtx, 60*time.Second)
 		defer cancelFn()
 		queryText := fmt.Sprintf(
-			"Password Authentication requested from connection  \n"+
+			"远程连接请求密码认证：  \n"+
 				"%s\n\n"+
-				"Password:", remoteDisplayName)
+				"密码：", remoteDisplayName)
 		request := &userinput.UserInputRequest{
 			ResponseType: "text",
 			QueryText:    queryText,
 			Markdown:     true,
-			Title:        "Password Authentication",
+			Title:        "密码认证",
 		}
 		response, err := userinput.GetUserInput(ctx, request)
 		if err != nil {
@@ -448,14 +448,14 @@ func promptChallengeQuestion(connCtx context.Context, question string, echo bool
 	ctx, cancelFn := context.WithTimeout(connCtx, 60*time.Second)
 	defer cancelFn()
 	queryText := fmt.Sprintf(
-		"Keyboard Interactive Authentication requested from connection  \n"+
+		"远程连接请求交互式认证：  \n"+
 			"%s\n\n"+
 			"%s", remoteName, question)
 	request := &userinput.UserInputRequest{
 		ResponseType: "text",
 		QueryText:    queryText,
 		Markdown:     true,
-		Title:        "Keyboard Interactive Authentication",
+		Title:        "交互式认证",
 		PublicText:   echo,
 	}
 	response, err := userinput.GetUserInput(ctx, request)
@@ -517,18 +517,18 @@ func writeToKnownHosts(knownHostsFile string, newLine string, getUserVerificatio
 func createUnknownKeyVerifier(ctx context.Context, knownHostsFile string, hostname string, remote string, key ssh.PublicKey) func() (*userinput.UserInputResponse, error) {
 	base64Key := base64.StdEncoding.EncodeToString(key.Marshal())
 	queryText := fmt.Sprintf(
-		"The authenticity of host '%s (%s)' can't be established "+
-			"as it **does not exist in any checked known_hosts files**. "+
-			"The host you are attempting to connect to provides this %s key:  \n"+
-			"%s.\n\n"+
-			"**Would you like to continue connecting?** If so, the key will be permanently "+
-			"added to the file %s "+
-			"to protect from future man-in-the-middle attacks.", hostname, remote, key.Type(), base64Key, knownHostsFile)
+		"无法验证主机 '%s (%s)' 的真实性，"+
+			"因为它**不在任何已检查的 known_hosts 文件中**。"+
+			"你要连接的主机提供了以下 %s 密钥：  \n"+
+			"%s。\n\n"+
+			"**是否继续连接？** 若继续，该密钥将被永久 "+
+			"添加到文件 %s，"+
+			"以防范未来的中间人攻击。", hostname, remote, key.Type(), base64Key, knownHostsFile)
 	request := &userinput.UserInputRequest{
 		ResponseType: "confirm",
 		QueryText:    queryText,
 		Markdown:     true,
-		Title:        "Known Hosts Key Missing",
+		Title:        "未知主机密钥",
 	}
 	return func() (*userinput.UserInputResponse, error) {
 		ctx, cancelFn := context.WithTimeout(ctx, 60*time.Second)
@@ -547,19 +547,19 @@ func createUnknownKeyVerifier(ctx context.Context, knownHostsFile string, hostna
 func createMissingKnownHostsVerifier(knownHostsFile string, hostname string, remote string, key ssh.PublicKey) func() (*userinput.UserInputResponse, error) {
 	base64Key := base64.StdEncoding.EncodeToString(key.Marshal())
 	queryText := fmt.Sprintf(
-		"The authenticity of host '%s (%s)' can't be established "+
-			"as **no known_hosts files could be found**. "+
-			"The host you are attempting to connect to provides this %s key:  \n"+
-			"%s.\n\n"+
-			"**Would you like to continue connecting?** If so:  \n"+
-			"- %s will be created  \n"+
-			"- the key will be added to %s\n\n"+
-			"This will protect from future man-in-the-middle attacks.", hostname, remote, key.Type(), base64Key, knownHostsFile, knownHostsFile)
+		"无法验证主机 '%s (%s)' 的真实性，"+
+			"因为**找不到 known_hosts 文件**。"+
+			"你要连接的主机提供了以下 %s 密钥：  \n"+
+			"%s。\n\n"+
+			"**是否继续连接？** 若继续：  \n"+
+			"- 将创建 %s  \n"+
+			"- 密钥将被添加到 %s\n\n"+
+			"这可以防范未来的中间人攻击。", hostname, remote, key.Type(), base64Key, knownHostsFile, knownHostsFile)
 	request := &userinput.UserInputRequest{
 		ResponseType: "confirm",
 		QueryText:    queryText,
 		Markdown:     true,
-		Title:        "Known Hosts File Missing",
+		Title:        "known_hosts 文件缺失",
 	}
 	return func() (*userinput.UserInputResponse, error) {
 		ctx, cancelFn := context.WithTimeout(context.Background(), 60*time.Second)

@@ -23,14 +23,16 @@ import (
 	"github.com/wavetermdev/waveterm/pkg/wstore"
 )
 
+// 工作区默认色板：墨观 Inkstone（zhongguose.com 中国传统色）玄墨系。
+// 旧版色板（#58C142 等）存量的工作区颜色由前端 mapLegacyWorkspaceColor 做显示映射，不改 DB。
 var WorkspaceColors = [...]string{
-	"#58C142", // Green (accent)
-	"#00FFDB", // Teal
-	"#429DFF", // Blue
-	"#BF55EC", // Purple
-	"#FF453A", // Red
-	"#FF9500", // Orange
-	"#FFE900", // Yellow
+	"#619ac3", // 羽扇豆蓝（动作色，打头）
+	"#2bae85", // 铜绿
+	"#c08eaf", // 萝兰紫
+	"#e2c027", // 姜黄
+	"#e1505d", // 海棠红 · 降彩
+	"#57c3c2", // 石绿
+	"#f28e16", // 杏黄
 }
 
 // 图标 id 由前端 makeIconClass 解析。svg@ 前缀走项目自带 SVG（frontend/app/asset/*.svg），

@@ -39,14 +39,6 @@ const webview = {
     vdom: {
         invalidTag: "Invalid Tag <{tag}>",
     },
-    aiFileDiff: {
-        loading: "Loading diff...",
-        noDiffData: "No diff data available",
-        missingChatMetadata: "Missing chatId or toolCallId in block metadata",
-        missingFileName: "Missing file name in block metadata",
-        noDiffFromServer: "No diff data returned from server",
-        errorLoading: "Error loading diff data: {msg}",
-    },
 };
 
 export { webview };

@@ -159,10 +159,6 @@ const QuickTips = () => {
                             <span className="text-[15px]">{t("quicktips.newTerminalBlock")}</span>
                             <KeyBinding keyDecl="Cmd:n" />
                         </div>
-                        <div className="flex flex-col gap-0.5 p-2 rounded-md hover:bg-white/5 transition-colors">
-                            <span className="text-[15px]">{t("quicktips.openWaveAIPanel")}</span>
-                            <KeyBinding keyDecl="Cmd:Shift:a" />
-                        </div>
                     </div>
 
                     <div className="flex flex-col gap-1.5">
@@ -194,10 +190,6 @@ const QuickTips = () => {
                         <div className="flex flex-col gap-0.5 p-2 rounded-md hover:bg-white/5 transition-colors">
                             <span className="text-[15px]">{t("quicktips.focusNthBlock")}</span>
                             <KeyBinding keyDecl="Ctrl:Shift:Digit" />
-                        </div>
-                        <div className="flex flex-col gap-0.5 p-2 rounded-md hover:bg-white/5 transition-colors">
-                            <span className="text-[15px]">{t("quicktips.focusWaveAI")}</span>
-                            <KeyBinding keyDecl="Ctrl:Shift:0" />
                         </div>
                     </div>
 

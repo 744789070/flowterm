@@ -21,6 +21,7 @@ const zhTab: DeepPartial<Dict["tab"]> = {
     copyTabId: "复制标签页 ID",
     flagTab: "标记标签页",
     backgrounds: "背景",
+    uiTheme: "界面主题",
     closeTab: "关闭标签页",
     addTab: "新建标签页",
     newTab: "新建标签页",
@@ -31,7 +32,6 @@ const zhTab: DeepPartial<Dict["tab"]> = {
     downloading: "下载中",
     installing: "安装中",
     clickToInstallUpdate: "点击安装更新",
-    toggleWaveAIPanel: "切换 Wave AI 面板",
 };
 
 export { zhTab };

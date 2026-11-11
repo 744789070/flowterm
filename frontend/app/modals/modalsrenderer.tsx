@@ -32,9 +32,9 @@ const ModalsRenderer = () => {
         rtn.push(<UpgradeOnboardingModal key={UpgradeOnboardingModal.displayName} />);
     }
     useEffect(() => {
-        if (!clientData.tosagreed) {
-            setNewInstallOnboardingOpen(true);
-        }
+        // 引导弹窗跟随 tosagreed：未记录（引导没走完最后一页）则打开，已记录则关闭，
+        // 避免完成时两条异步记录到达顺序不同导致弹窗重开
+        setNewInstallOnboardingOpen(!clientData.tosagreed);
     }, [clientData]);
 
     useEffect(() => {

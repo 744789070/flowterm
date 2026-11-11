@@ -2,34 +2,35 @@
 // SPDX-License-Identifier: Apache-2.0
 
 :root {
-    --main-text-color: #f7f7f7;
+    /* 玄墨 Xuanmo（墨观 Inkstone，zhongguose.com 中国传统色）——默认暗色主题 */
+    --main-text-color: #d4cec4;
     --title-font-size: 18px;
     --window-opacity: 1;
-    --secondary-text-color: rgb(195, 200, 194);
-    --grey-text-color: #666;
-    --main-bg-color: rgb(34, 34, 34);
-    --border-color: rgba(255, 255, 255, 0.16);
+    --secondary-text-color: #ada599;
+    --grey-text-color: #8b8597;
+    --main-bg-color: #14131a;
+    --border-color: #343240;
     --base-font: normal 14px / normal "Inter", sans-serif;
     --fixed-font: normal 12px / normal "Hack", monospace;
-    --accent-color: rgb(88, 193, 66);
-    --panel-bg-color: rgba(31, 33, 31, 0.5);
-    --highlight-bg-color: rgba(255, 255, 255, 0.2);
+    --accent-color: #619ac3; /* 羽扇豆蓝 */
+    --panel-bg-color: rgba(26, 25, 34, 0.5);
+    --highlight-bg-color: #332f46;
     --markdown-font-family:
         -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif, "Apple Color Emoji",
         "Segoe UI Emoji";
     --markdown-font-size: 14px;
     --markdown-fixed-font-size: 12px;
-    --error-color: rgb(229, 77, 46);
-    --warning-color: rgb(224, 185, 86);
-    --success-color: rgb(78, 154, 6);
-    --hover-bg-color: rgba(255, 255, 255, 0.1);
-    --block-bg-color: rgba(0, 0, 0, 0.5);
-    --block-bg-solid-color: rgb(0, 0, 0);
+    --error-color: #e25737; /* 银朱 · 降彩 */
+    --warning-color: #f28e16; /* 杏黄 */
+    --success-color: #2bae85; /* 铜绿 */
+    --hover-bg-color: rgba(255, 255, 255, 0.08);
+    --block-bg-color: rgba(15, 14, 20, 0.5);
+    --block-bg-solid-color: rgb(15, 14, 20);
     --block-border-radius: 8px;
 
-    --keybinding-color: #e0e0e0;
-    --keybinding-bg-color: #333;
-    --keybinding-border-color: #444;
+    --keybinding-color: #d4cec4;
+    --keybinding-bg-color: #262430;
+    --keybinding-border-color: #343240;
 
     /* scrollbar colors */
     --scrollbar-background-color: transparent;
@@ -42,7 +43,7 @@
     --header-icon-width: 16px;
     --header-height: 30px;
 
-    --tab-green: rgb(88, 193, 66);
+    --tab-green: #619ac3; /* 羽扇豆蓝（沿用 tab-green 变量名） */
 
     /* z-index values */
     --zindex-header-hover: 100;
@@ -78,8 +79,8 @@
     // xterm-decoration-top: 2
 
     // modal colors
-    --modal-bg-color: #232323;
-    --modal-header-bottom-border-color: rgba(241, 246, 243, 0.15);
+    --modal-bg-color: #22212c;
+    --modal-header-bottom-border-color: rgba(212, 206, 196, 0.15);
     --modal-border-color: rgba(255, 255, 255, 0.12); /* toggle colors */
     --modal-border-radius: 6px;
     --toggle-bg-color: var(--border-color);
@@ -90,10 +91,10 @@
     --toggle-checked-bg-color: var(--accent-color);
 
     // link color
-    --link-color: #58c142;
+    --link-color: #619ac3;
 
     // form colors
-    --form-element-border-color: rgba(241, 246, 243, 0.15);
+    --form-element-border-color: rgba(212, 206, 196, 0.15);
     --form-element-bg-color: var(--main-bg-color);
     --form-element-text-color: var(--main-text-color);
     --form-element-primary-text-color: var(--main-text-color);
@@ -109,16 +110,17 @@
     --conn-icon-color-5: #497bf8;
     --conn-icon-color-6: #ffa24e;
     --conn-icon-color-7: #dbde52;
-    --conn-icon-color-8: #58c142;
+    --conn-icon-color-8: #2bae85;
     --conn-status-overlay-bg-color: rgba(230, 186, 30, 0.2);
 
-    --sysinfo-cpu-color: #58c142;
+    --sysinfo-cpu-color: #619ac3;
     --sysinfo-mem-color: #53b4ea;
 
     --bulb-color: rgb(255, 221, 51);
 
     // term colors (16 + 6) form the base terminal theme
     // for consistency these colors should be used by plugins/applications
+    // 命令行配色先参考原版（官方 Wave 默认值）
     --term-black: #000000;
     --term-red: #cc0000;
     --term-green: #4e9a06;
@@ -144,17 +146,17 @@
     --term-cursor-accent: #000000;
 
     // button colors
-    --button-text-color: #000000;
-    --button-green-bg: var(--term-green);
-    --button-green-border-color: #29f200;
+    --button-text-color: #14131a;
+    --button-green-bg: var(--accent-color);
+    --button-green-border-color: #74a6ca; /* 羽扇豆蓝 · 悬停派生色 */
     --button-grey-bg: rgba(255, 255, 255, 0.04);
     --button-grey-hover-bg: rgba(255, 255, 255, 0.09);
     --button-grey-border-color: rgba(255, 255, 255, 0.1);
     --button-grey-outlined-color: rgba(255, 255, 255, 0.6);
-    --button-red-bg: #cc0000;
-    --button-red-hover-bg: #f93939;
-    --button-red-border-color: #fc3131;
-    --button-red-outlined-color: #ff3c3c;
-    --button-yellow-bg: #c4a000;
-    --button-yellow-hover-bg: #fce94f;
+    --button-red-bg: #e25737;
+    --button-red-hover-bg: #ea586c;
+    --button-red-border-color: #e1505d;
+    --button-red-outlined-color: #ea586c;
+    --button-yellow-bg: #d6a01d;
+    --button-yellow-hover-bg: #eed045;
 }

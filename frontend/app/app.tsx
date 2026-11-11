@@ -8,7 +8,6 @@ import {
     getBlockBadgeAtom,
 } from "@/app/store/badge";
 import { ClientModel } from "@/app/store/client-model";
-import { FocusManager } from "@/app/store/focusManager";
 import { GlobalModel } from "@/app/store/global-model";
 import { globalStore } from "@/app/store/jotaiStore";
 import { getTabModelByTabId, TabModelContext } from "@/app/store/tab-model";
@@ -33,6 +32,7 @@ import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { AppBackground } from "./app-bg";
 import { CenteredDiv } from "./element/quickelems";
+import { UiThemeUpdater } from "./uitheme";
 
 import "./app.scss";
 
@@ -145,9 +145,8 @@ function AppSettingsUpdater() {
         const isTransparentOrBlur =
             (windowSettings?.["window:transparent"] || windowSettings?.["window:blur"]) ?? false;
         const opacity = util.boundNumber(windowSettings?.["window:opacity"] ?? 0.8, 0, 1);
-        const baseBgColor = windowSettings?.["window:bgcolor"];
         const mainDiv = document.getElementById("main");
-        // console.log("window settings", windowSettings, isTransparentOrBlur, opacity, baseBgColor, mainDiv);
+        // --main-bg-color（含 window:bgcolor 覆写）由 UiThemeUpdater 统一管理，这里不再写入
         if (isTransparentOrBlur) {
             mainDiv.classList.add("is-transparent");
             if (opacity != null) {
@@ -158,11 +157,6 @@ function AppSettingsUpdater() {
         } else {
             mainDiv.classList.remove("is-transparent");
             document.body.style.removeProperty("--window-opacity");
-        }
-        if (baseBgColor != null) {
-            document.body.style.setProperty("--main-bg-color", baseBgColor);
-        } else {
-            document.body.style.removeProperty("--main-bg-color");
         }
     }, [windowSettings]);
     return null;
@@ -226,16 +220,6 @@ const MacOSFirstClickHandler = () => {
             }
             return null;
         };
-        const isAIPanelTarget = (target: EventTarget): boolean => {
-            let elem = target as HTMLElement;
-            while (elem != null) {
-                if (elem.dataset?.aipanel) {
-                    return true;
-                }
-                elem = elem.parentElement;
-            }
-            return false;
-        };
         const handleMouseDown = (e: MouseEvent) => {
             const timeDiff = Date.now() - windowFocusTime;
             if (windowFocusTime != null && timeDiff < 50) {
@@ -248,11 +232,6 @@ const MacOSFirstClickHandler = () => {
                     setTimeout(() => {
                         console.log("macos first-click, focusing block", blockId);
                         refocusNode(blockId);
-                    }, 10);
-                } else if (isAIPanelTarget(e.target)) {
-                    setTimeout(() => {
-                        console.log("macos first-click, focusing AI panel");
-                        FocusManager.getInstance().setWaveAIFocused(true);
                     }, 10);
                 }
                 console.log("macos first-click detected, canceled", timeDiff + "ms");
@@ -384,6 +363,7 @@ const AppInner = () => {
             <AppKeyHandlers />
             <AppFocusHandler />
             <AppSettingsUpdater />
+            <UiThemeUpdater />
             <BadgeAutoClearing />
             <DndProvider backend={HTML5Backend}>
                 <Workspace />

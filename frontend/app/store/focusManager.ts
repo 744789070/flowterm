@@ -9,6 +9,8 @@ import { getLayoutModelForStaticTab } from "@/layout/index";
 import { focusedBlockId } from "@/util/focusutil";
 import { Atom, atom, type PrimitiveAtom } from "jotai";
 
+// FlowTerm 主窗口已移除 Wave AI 面板入口（focusType 不会再变成 "waveai"），
+// 但 builder 窗口的 AI 聊天仍复用 aipanel 组件，保留 "waveai" 焦点类型与方法供其使用。
 export type FocusStrType = "node" | "waveai";
 
 export class FocusManager {

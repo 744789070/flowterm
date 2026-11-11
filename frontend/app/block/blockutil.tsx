@@ -53,7 +53,6 @@ const BlockViewNameKeys: { [view: string]: TranslationKey } = {
     term: "views.terminal",
     preview: "views.preview",
     web: "views.web",
-    waveai: "views.waveai",
     help: "views.help",
     tips: "views.tips",
     processviewer: "views.processes",
@@ -63,7 +62,6 @@ const BlockViewNameKeys: { [view: string]: TranslationKey } = {
     tsunami: "views.waveApp",
     cpuplot: "views.cpuPlot",
     sysinfo: "views.sysinfo",
-    aifilediff: "views.aiFileDiff",
 };
 
 export function blockViewToNameKey(view: string): TranslationKey | null {

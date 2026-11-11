@@ -6,7 +6,6 @@ const views = {
     terminal: "Terminal",
     preview: "Preview",
     web: "Web",
-    waveai: "WaveAI",
     help: "Help",
     tips: "Tips",
     processes: "Processes",
@@ -15,7 +14,6 @@ const views = {
     waveApp: "Wave App",
     cpuPlot: "CPU Plot",
     sysinfo: "System Info",
-    aiFileDiff: "AI File Diff",
 };
 
 export { views };

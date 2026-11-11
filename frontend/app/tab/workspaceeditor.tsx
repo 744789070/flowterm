@@ -1,5 +1,6 @@
 import { useT } from "@/i18n/i18n";
 import { fireAndForget, makeIconClass } from "@/util/util";
+import { mapLegacyWorkspaceColor } from "@/util/waveutil";
 import clsx from "clsx";
 import { memo, useEffect, useRef, useState } from "react";
 import { Button } from "../element/button";
@@ -113,7 +114,8 @@ const WorkspaceEditorComponent = ({
                 autoFocus
                 autoSelect
             />
-            <ColorSelector selectedColor={color} colors={colors} onSelect={onColorChange} />
+            {/* 旧默认色映射到新色板对应色后再做选中比对（旧绿 → 铜绿），不改 DB 存量值 */}
+            <ColorSelector selectedColor={mapLegacyWorkspaceColor(color)} colors={colors} onSelect={onColorChange} />
             <IconSelector selectedIcon={icon} icons={icons} onSelect={onIconChange} />
             <div className="delete-ws-btn-wrapper">
                 <Button className="ghost red text-[12px] bold" onClick={onDeleteWorkspace}>

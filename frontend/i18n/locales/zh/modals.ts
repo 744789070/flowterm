@@ -25,11 +25,22 @@ const zhModals: DeepPartial<Dict["modals"]> = {
         remote: "远程",
         reconnectTo: "重新连接到 {conn}",
         disconnect: "断开连接 {conn}",
-        editConnections: "编辑连接",
+        addConnection: "添加链接",
         newConnection: "{conn}（新建连接）",
     },
     modal: {
         closeEsc: "关闭 (ESC)",
+    },
+    addConn: {
+        title: "添加链接",
+        description: "填写 SSH 连接信息，保存后会出现在连接列表中。",
+        name: "连接名称",
+        host: "主机（SSH）",
+        user: "用户名（可选）",
+        port: "端口（可选，默认 22）",
+        submit: "添加",
+        saveFailed: "保存失败，请重试",
+        overwriteConfirm: "链接“{name}”已存在，覆盖其配置？",
     },
 };
 

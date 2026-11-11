@@ -33,15 +33,6 @@ const onboarding = {
         flyingBlind:
             "But, without usage data, we're flying blind. A GitHub star helps us know Wave is useful and worth maintaining.",
     },
-    waveai: {
-        intro:
-            "Wave AI is your terminal assistant with context. I can read your terminal output, analyze widgets, read/write files, and help you solve problems faster.",
-        toggleIntro: "Toggle the Wave AI panel with the",
-        toggleOutro: "button in the header (top left)",
-        shortcutIntro: "Or use the keyboard shortcut",
-        shortcutOutro: "to quickly toggle",
-        byok: "Bring your own API keys or run local models with Ollama, LM Studio, and other OpenAI-compatible providers",
-    },
     durable: {
         title: "Durable SSH Sessions",
         badge: "SSH Sessions, Protected",
@@ -351,21 +342,6 @@ const onboarding = {
     command: {
         shortcuts:
             "### Keyboard Shortcuts\n\n**Switch Tabs**\nPress {modkey} + Number (1-9) to quickly switch between tabs.\n\n**Navigate Blocks**\nUse Ctrl-Shift + Arrow Keys (←→↑↓) to move between blocks in the current tab.\n\nUse Ctrl-Shift + Number (1-9) to focus a specific block by its position.",
-    },
-    fakechat: {
-        prompt1: "Check out ~/waveterm and summarize the project — what it does and how it's organized.",
-        toolDesc1: "reading directory \"~/waveterm\"",
-        response1:
-            "Here's a quick, file-structure–driven overview of this repo (Wave Terminal):\n\n## What it is\n- Electron + React front end with a Go backend (\"wavesrv\"). Provides a terminal with GUI widgets, previews, web, and AI. (README.md)\n- Licensed Apache-2.0. (LICENSE)\n\n## Architecture at a glance\n- **Electron main process:** `emain/*.ts` configures windows, menus, preload scripts, updater, and ties into the Go backend via local RPC. (`emain/`)\n- **Renderer UI:** React/TS built with Vite, Tailwind. (`frontend/`, `index.html`, `electron.vite.config.ts`)\n- **Go backend (\"wavesrv\"):** starts services, web and websocket listeners, telemetry loops, config watcher, local RPC, filestore and SQLite-backed object store. (`cmd/server/main-server.go`, `pkg/*`)\n- **CLI/helper (\"wsh\"):** built for multiple OS/arch; used for shell integration and remote operations. (`cmd/wsh/`, `Taskfile.yml build:wsh`)\n\n## Key directories\n- **cmd/:** entrypoints and generators\n  - `server/`: wavesrv main\n  - `generategs/`, `generatego/`: TS/Go bindings generation\n  - `wsh/`: shell helper\n\n- **pkg/:** backend packages\n  - `wcore/`: startup coordination, initial data, window/workspace creation\n  - `web/`: HTTP+WS servers, Unix listener\n  - `waveai/`: AI backends (OpenAI, Anthropic, Google, Perplexity)\n  - `wshrpc`, `wshutil`, `wslconn`, `remote/*`: local/remote RPC, WSL, SSH, fileshare\n  - `wstore/`: persistent store (SQLite via sqlx); `waveobj/`: object model\n  - `filestore/`: local file cache/storage\n  - `telemetry/`: metrics/events, periodic reporting",
-        prompt2: "can you analyze the log output in my terminal?",
-        toolDesc2: "reading terminal output from widget",
-        response2:
-            "Here's what your log shows:\n\n- Normal startup/init at 18:06:51 (router/register, DBGetAllObjsByType, Stat/Read).\n- Many FocusWindow events — normal UI activity.\n- 18:08:28.558 WebSocket ReadPump error: close 1001 (going away) — usually a tab/app reload, sleep, or brief network hiccup.\n- 18:08:29 re-init + new WebSocket connection — successful auto-reconnect.\n- SetMetaCommand and periodic filestore flushes with err: — normal; no failures.\n- No panics/fatal errors; just the transient disconnect.\n\nIf that disconnect was unexpected, check for a tab reload/sleep at 18:08:28, and watch for repeats.\n\nWant deeper triage? Run these and paste results:\n\n```bash\n# 1) Scan recent logs for problems\ngrep -Ei 'error|panic|fatal|websocket|1006|1011' \\\n  \"$HOME/Library/Application Support/waveterm-dev/waveapp.log\" | tail -n 200\n\n# 2) Inspect around the disconnect window\nawk '($0 ~ /2025-10-10 18:08:2[0-9]/){print}' \\\n  \"$HOME/Library/Application Support/waveterm-dev/waveapp.log\"\n\n# 3) Live follow for recurring drops\ntail -f \"$HOME/Library/Application Support/waveterm-dev/waveapp.log\" \\\n  | grep -Ei 'error|panic|fatal|websocket|close'\n```\n\nNeed me to look at a longer slice (e.g., last 1000 lines) or a different time range?",
-        thinking: "AI is thinking...",
-        context: "Context",
-        widgetAccessOn: "Widget Access ON",
-        toggleOn: "ON",
-        moreOptions: "More options",
     },
 };
 

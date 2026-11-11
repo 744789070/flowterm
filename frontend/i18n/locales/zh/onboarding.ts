@@ -34,14 +34,6 @@ const zhOnboarding: DeepPartial<Dict["onboarding"]> = {
         privacy: "没问题，我们尊重你的隐私。",
         flyingBlind: "不过，缺少使用数据会让我们两眼一抹黑。一个 GitHub Star 就能让我们知道 Wave 有用、值得持续维护。",
     },
-    waveai: {
-        intro: "Wave AI 是懂上下文的终端助手。它可以读取你的终端输出、分析小组件、读写文件，帮助你更快地解决问题。",
-        toggleIntro: "通过头部（左上角）的",
-        toggleOutro: "按钮开关 Wave AI 面板",
-        shortcutIntro: "也可以使用键盘快捷键",
-        shortcutOutro: "快速开关",
-        byok: "可以自带 API 密钥，或通过 Ollama、LM Studio 及其他 OpenAI 兼容的提供方运行本地模型",
-    },
     durable: {
         title: "持久 SSH 会话",
         badge: "SSH 会话，全程守护",
@@ -323,21 +315,6 @@ const zhOnboarding: DeepPartial<Dict["onboarding"]> = {
     command: {
         shortcuts:
             "### 键盘快捷键\n\n**切换标签页**\n按 {modkey} + 数字（1-9）可在标签页之间快速切换。\n\n**在块之间导航**\n使用 Ctrl-Shift + 方向键（←→↑↓）在当前标签页的块之间移动。\n\n使用 Ctrl-Shift + 数字（1-9）可按位置聚焦特定块。",
-    },
-    fakechat: {
-        prompt1: "看看 ~/waveterm 这个项目，总结一下它是做什么的、是如何组织的。",
-        toolDesc1: "正在读取目录“~/waveterm”",
-        response1:
-            "以下是基于文件结构对这个仓库（Wave Terminal）的快速概览：\n\n## 这是什么\n- Electron + React 前端，Go 后端（“wavesrv”）。提供带 GUI 小组件、预览、Web 和 AI 的终端。(README.md)\n- 采用 Apache-2.0 许可证。(LICENSE)\n\n## 架构一览\n- **Electron 主进程：** `emain/*.ts` 负责配置窗口、菜单、preload 脚本和更新器，并通过本地 RPC 与 Go 后端衔接。(`emain/`)\n- **渲染层 UI：** 使用 Vite、Tailwind 构建的 React/TS 应用。(`frontend/`、`index.html`、`electron.vite.config.ts`)\n- **Go 后端（“wavesrv”）：** 启动各项服务、Web 和 WebSocket 监听器、遥测循环、配置监视器、本地 RPC、filestore 以及基于 SQLite 的对象存储。(`cmd/server/main-server.go`、`pkg/*`)\n- **CLI/辅助工具（“wsh”）：** 为多种 OS/架构构建；用于 shell 集成和远程操作。(`cmd/wsh/`、`Taskfile.yml build:wsh`)\n\n## 关键目录\n- **cmd/:** 入口和生成器\n  - `server/`：wavesrv 主程序\n  - `generategs/`、`generatego/`：TS/Go 绑定生成\n  - `wsh/`：shell 辅助工具\n\n- **pkg/:** 后端包\n  - `wcore/`：启动协调、初始数据、窗口/工作区创建\n  - `web/`：HTTP+WS 服务器、Unix 监听\n  - `waveai/`：AI 后端（OpenAI、Anthropic、Google、Perplexity）\n  - `wshrpc`、`wshutil`、`wslconn`、`remote/*`：本地/远程 RPC、WSL、SSH、文件共享\n  - `wstore/`：持久化存储（通过 sqlx 使用 SQLite）；`waveobj/`：对象模型\n  - `filestore/`：本地文件缓存/存储\n  - `telemetry/`：指标/事件、周期性上报",
-        prompt2: "能帮我分析一下终端里的日志输出吗？",
-        toolDesc2: "正在从小组件读取终端输出",
-        response2:
-            "你的日志显示：\n\n- 18:06:51 正常启动/初始化（router/register、DBGetAllObjsByType、Stat/Read）。\n- 大量 FocusWindow 事件——正常的 UI 活动。\n- 18:08:28.558 WebSocket ReadPump 错误：close 1001（going away）——通常是标签页/应用重载、休眠或短暂的网络抖动。\n- 18:08:29 重新初始化并建立新的 WebSocket 连接——自动重连成功。\n- SetMetaCommand 和周期性 filestore 刷新带有 err: ——正常，没有失败。\n- 没有 panic/致命错误，只是那次瞬间的断开。\n\n如果那次断开出乎意料，请检查 18:08:28 前后是否有标签页重载/休眠，并留意是否再次出现。\n\n需要更深入的分析？运行以下命令并粘贴结果：\n\n```bash\n# 1) Scan recent logs for problems\ngrep -Ei 'error|panic|fatal|websocket|1006|1011' \\\n  \"$HOME/Library/Application Support/waveterm-dev/waveapp.log\" | tail -n 200\n\n# 2) Inspect around the disconnect window\nawk '($0 ~ /2025-10-10 18:08:2[0-9]/){print}' \\\n  \"$HOME/Library/Application Support/waveterm-dev/waveapp.log\"\n\n# 3) Live follow for recurring drops\ntail -f \"$HOME/Library/Application Support/waveterm-dev/waveapp.log\" \\\n  | grep -Ei 'error|panic|fatal|websocket|close'\n```\n\n需要我查看更长的片段（例如最近 1000 行）或其他时间范围吗？",
-        thinking: "AI 正在思考……",
-        context: "上下文",
-        widgetAccessOn: "小组件访问已开启",
-        toggleOn: "开",
-        moreOptions: "更多选项",
     },
 };
 

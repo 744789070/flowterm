@@ -9,7 +9,6 @@ const zhViews: DeepPartial<Dict["views"]> = {
     terminal: "终端",
     preview: "预览",
     web: "网页",
-    waveai: "WaveAI",
     help: "帮助",
     tips: "提示",
     processes: "进程",
@@ -18,7 +17,6 @@ const zhViews: DeepPartial<Dict["views"]> = {
     waveApp: "Wave App",
     cpuPlot: "CPU 图表",
     sysinfo: "系统信息",
-    aiFileDiff: "AI 文件差异",
 };
 
 export { zhViews };

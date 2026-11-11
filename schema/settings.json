@@ -57,6 +57,17 @@
             "zh"
           ]
         },
+        "app:uityheme": {
+          "type": "string",
+          "enum": [
+            "xuanmo",
+            "xuanmo-dimmed",
+            "canghai",
+            "mono",
+            "wave",
+            "github"
+          ]
+        },
         "feature:waveappbuilder": {
           "type": "boolean"
         },

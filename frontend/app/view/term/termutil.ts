@@ -1,7 +1,8 @@
 // Copyright 2025, Command Line Inc.
 // SPDX-License-Identifier: Apache-2.0
 
-export const DefaultTermTheme = "default-dark";
+// 命令行配色先参考原版（官方 Wave 原版 Dark：纯黑底、默认光标）；玄墨终端主题仍可在菜单中选择
+export const DefaultTermTheme = "wave-dark";
 import { RpcApi } from "@/app/store/wshclientapi";
 import { TabRpcClient } from "@/app/store/wshrpcutil";
 import * as TermTypes from "@xterm/xterm";

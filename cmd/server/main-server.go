@@ -141,6 +141,11 @@ func diagnosticLoop() {
 		log.Printf("WAVETERM_NOPING set, disabling diagnostic ping\n")
 		return
 	}
+	// FlowTerm: 遥测关闭时诊断 ping 一并禁用，不再向上游服务器外呼
+	if !telemetry.IsTelemetryEnabled() {
+		log.Printf("telemetry disabled, disabling diagnostic ping\n")
+		return
+	}
 	var lastSentDate string
 	time.Sleep(InitialDiagnosticWait)
 	for {
