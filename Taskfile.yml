@@ -642,7 +642,7 @@ tasks:
               ignore_error: true
             - powershell -NoProfile -NonInteractive New-Item -ItemType Directory -Force -Path scaffold
             - powershell -NoProfile -NonInteractive Copy-Item -Path ../templates/package.json.tmpl -Destination scaffold/package.json
-            - powershell -NoProfile -NonInteractive -Command "Set-Location scaffold; npm install"
+            - powershell -NoProfile -NonInteractive -Command "Set-Location scaffold; npm.cmd install"
             - powershell -NoProfile -NonInteractive Move-Item -Path scaffold/node_modules -Destination scaffold/nm
             - powershell -NoProfile -NonInteractive Copy-Item -Recurse -Force -Path dist -Destination scaffold/
             - powershell -NoProfile -NonInteractive New-Item -ItemType Directory -Force -Path scaffold/dist/tw
