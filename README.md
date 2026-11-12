@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://github.com/744789070/flowterm">
+  <a href="https://github.com/bintang1996/flowterm">
     <img alt="FlowTerm Mascot" src="./assets/mascot.png" width="200" style="border-radius: 24px;">
   </a>
   <br/>

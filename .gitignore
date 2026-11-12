@@ -47,3 +47,6 @@ docs/superpowers
 
 # ZCode 会话产物
 .zcode/
+
+# 本地开发启动器
+/dev.bat
